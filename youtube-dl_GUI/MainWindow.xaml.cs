@@ -2,6 +2,9 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,7 +20,42 @@ namespace youtube_dl_GUI
         public MainWindow()
         {
             InitializeComponent();
+            updateChecker();
             cancel.IsEnabled = false;
+        }
+        private void updateChecker()
+        {
+            Encoding enc = Encoding.GetEncoding("UTF-8");
+            WebClient wc = new WebClient();
+            StreamReader sm = new StreamReader(wc.OpenRead("https://toaru-web.net/2022/01/06/yt-dlp_gui/"));
+            string html = sm.ReadToEnd();
+
+            HtmlAgilityPack.HtmlDocument Doc = new HtmlAgilityPack.HtmlDocument();
+            Doc.LoadHtml(html);
+            var update = Doc.DocumentNode.SelectSingleNode("//p[@class=\"update\"]");
+            string url = update.InnerText;
+            string pattern = "[正式版（）更新日]";
+            string replacement = "";
+            Regex regEx = new Regex(pattern);
+            string sanitized = Regex.Replace(regEx.Replace(url, replacement), @"\s+", " ");
+            DateTime time1 = DateTime.Parse("2022/01/20 11:24:00");
+            DateTime time2 = DateTime.Parse(sanitized);
+            if (time1.Date < time2.Date)
+            {
+                MessageBoxResult msResult = MessageBox.Show("新しいバージョンがあります！\n確認しますか？", "アップデート", MessageBoxButton.YesNo);
+                if (msResult == MessageBoxResult.Yes)
+                {
+                    System.Diagnostics.Process.Start("https://toaru-web.net/2022/01/06/yt-dlp_gui/");
+
+                }
+            }
+            else
+            {
+
+            }
+
+
+
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
