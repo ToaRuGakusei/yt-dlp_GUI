@@ -1,5 +1,4 @@
-﻿using MahApps.Metro.Controls;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -8,13 +7,14 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace youtube_dl_GUI
 {
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class MainWindow : MetroWindow
+    public partial class MainWindow
     {
         private string URl;
         public MainWindow()
@@ -22,7 +22,10 @@ namespace youtube_dl_GUI
             InitializeComponent();
             updateChecker();
             cancel.IsEnabled = false;
+
+
         }
+
         private void updateChecker()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -60,9 +63,15 @@ namespace youtube_dl_GUI
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            URl = URL.Text;
+            if (u.Text.Contains("https"))
+            {
+                que.Items.Add(new { url = u.Text, Size = "" });
+
+            }
             run.IsEnabled = false;
             cancel.IsEnabled = true;
+            int i = 0;
+
             Task task = Task.Run(() =>
             {
                 Download();
@@ -83,6 +92,8 @@ namespace youtube_dl_GUI
         }
         private ProcessStartInfo si;
         private string cmd;
+        public int i = 0;
+        public int n = 0;
         private void Download()
         {
             StreamReader sm = new StreamReader(Path.GetTempPath() + "\\" + "Path.txt");
@@ -163,12 +174,12 @@ namespace youtube_dl_GUI
                             que.Items.RemoveAt(0);
                             list();
                         }
-                        if(que.Items.Count == 0)
+                        if (que.Items.Count == 0)
                         {
                             soundplayer();
                             MessageBox.Show("ダウンロードが終了しました。", "終了", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
-                        
+
                     }));
                     // プロセスが終了すると呼ばれる
                     ctoken.Cancel();
@@ -201,7 +212,34 @@ namespace youtube_dl_GUI
                                         prog.Value = perc;
                                         prog_label.Content = perc + "%";
                                     }
+                                    Match GiB = Regex.Match(l, @"\d{0,999999}.\d{0,999999}(GiB)", RegexOptions.IgnoreCase);
+                                    Match MiB = Regex.Match(l, @"\d{0,999999}.\d{0,999999}(MiB)+(?!/)", RegexOptions.IgnoreCase);
+                                    string M = MiB.Value;
+                                    string G = GiB.Value;
+                                    if (M.Contains("MiB") && n == 0)
+                                    {
+                                        M = M.Replace(" at", "");
+                                        foreach (var li in que.Items)
+                                        {
+                                            que.Items.RemoveAt(0);
+                                            que.Items.Add(new { url = li, Size = M });
+                                            break;
+                                        }
 
+                                        n++;
+                                    }
+                                    if (G.Contains("GiB") && n == 0)
+                                    {
+                                        G = G.Replace(" at", "");
+                                        foreach (var li in que.Items)
+                                        {
+                                            que.Items.RemoveAt(0);
+                                            que.Items.Add(new { url = li, Size = G });
+                                            break;
+                                        }
+
+                                        n++;
+                                    }
                                     label1.Content = ($"{l}");
                                 }));
                             }
@@ -210,6 +248,8 @@ namespace youtube_dl_GUI
 
                             }
                         }
+                        n = 0;
+
                     }),
                     Task.Run(() =>
                     {
@@ -268,13 +308,18 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
 
         private void Q_Click(object sender, RoutedEventArgs e)
         {
-            if (URL.Text.Contains("https"))
-                que.Items.Add(URL.Text);
+            if (u.Text.Contains("https"))
+                que.Items.Add(u.Text);
         }
 
         private void Clear_Click(object sender, RoutedEventArgs e)
         {
             que.Items.Clear();
+        }
+
+        private void que_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }
