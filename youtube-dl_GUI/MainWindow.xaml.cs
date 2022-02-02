@@ -1,11 +1,17 @@
-﻿using System;
+﻿
+using Microsoft.WindowsAPICodePack.Dialogs;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.UI;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -14,15 +20,21 @@ namespace youtube_dl_GUI
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class MainWindow
+    public partial class MainWindow : MahApps.Metro.Controls.MetroWindow
     {
         private string URl;
+        public Match match;
+        public System.Net.WebClient wc = new System.Net.WebClient();
+        public System.IO.StreamReader Sm;
+        public HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+        public HtmlAgilityPack.HtmlDocument Doc = new HtmlAgilityPack.HtmlDocument();
         public MainWindow()
         {
             InitializeComponent();
             updateChecker();
             cancel.IsEnabled = false;
-
+            load();
+            
 
         }
 
@@ -41,7 +53,7 @@ namespace youtube_dl_GUI
             string replacement = "";
             Regex regEx = new Regex(pattern);
             string sanitized = Regex.Replace(regEx.Replace(url, replacement), @"\s+", " ");
-            DateTime time1 = DateTime.Parse("2022/01/20 11:24:00");
+            DateTime time1 = DateTime.Parse("2022/02/10 18:18:00");
             DateTime time2 = DateTime.Parse(sanitized);
             if (time1.Date < time2.Date)
             {
@@ -63,14 +75,16 @@ namespace youtube_dl_GUI
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
+            mp4_mkv();
+            soundonoff();
             if (u.Text.Contains("https"))
             {
-                que.Items.Add(new { url = u.Text, Size = "" });
+                que.Items.Add(new { url = u.Text, Size = "" ,ETA = ""});
 
             }
+            
             run.IsEnabled = false;
             cancel.IsEnabled = true;
-            int i = 0;
 
             Task task = Task.Run(() =>
             {
@@ -80,6 +94,8 @@ namespace youtube_dl_GUI
 
 
         }
+
+        
         private void list()
         {
             Task task = Task.Run(() =>
@@ -94,11 +110,11 @@ namespace youtube_dl_GUI
         private string cmd;
         public int i = 0;
         public int n = 0;
+        public string title;
         private void Download()
         {
             StreamReader sm = new StreamReader(Path.GetTempPath() + "\\" + "Path.txt");
             string saveFolder = sm.ReadToEnd();
-            //string command = @"D:\ユーザーデータ\Documents\repo\youtube-dl_GUI\youtube-dl_GUI\youtube-dl.exe";
             StreamReader sm3 = new StreamReader(Path.GetTempPath() + "\\" + "switch.txt");
             string mp4_mkv = sm3.ReadToEnd();
             sm.Close();
@@ -112,6 +128,8 @@ namespace youtube_dl_GUI
                     {
                         if (i == 0)
                         {
+                            //string t = item.ToString();
+                            u.Text = DataBinder.Eval(item, "url").ToString();
                             si = new ProcessStartInfo(@".\yt-dlp.exe", $"--format bestvideo[ext=mp4]+bestaudio[ext=m4a] --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -ciw -o \"{saveFolder}\\%(title)s\" {item} ");
                         }
 
@@ -122,9 +140,6 @@ namespace youtube_dl_GUI
                 }
                 else
                 {
-                    //Directory.CreateDirectory(Path.GetTempPath() + "\\" + "toggle.txt");
-                    //Directory.CreateDirectory(Path.GetTempPath() + "\\" + "cmd.txt");
-                    //StreamReader sm1 = new StreamReader(Path.GetTempPath() + "\\" + "toggle.txt");
                     if (File.Exists(Path.GetTempPath() + "\\" + "cmd.txt"))
                     {
                         StreamReader sm2 = new StreamReader(Path.GetTempPath() + "\\" + "cmd.txt");
@@ -142,8 +157,6 @@ namespace youtube_dl_GUI
                     {
                         si = new ProcessStartInfo(@".\yt-dlp.exe", $"--format bestvideo[ext=mp4]+bestaudio[ext=m4a] --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -ciw -o \"{saveFolder}\\%(title)s\" {URl} ");
                     }
-                    //sm1.Close();
-
 
                 }
 
@@ -200,7 +213,76 @@ namespace youtube_dl_GUI
                             {
                                 this.Dispatcher.Invoke((Action)(() =>
                                 {
+                                    string youtubelive = "";
+                                    if (l.Contains("youtube_live_chat"))
+                                    {
+                                        youtubelive = l.ToString();
+                                    }
+                                    Match GiB = Regex.Match(l, @"\d{0,999999}.\d{0,999999}(GiB)", RegexOptions.IgnoreCase);
+                                    Match MiB = Regex.Match(l, @"\d{0,999999}.\d{0,999999}(MiB)+(?!/)", RegexOptions.IgnoreCase);
+                                    Match ETA = Regex.Match(l, @"ETA \d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}", RegexOptions.IgnoreCase);
+                                    object M = MiB.Value;
+                                    object G = GiB.Value;
+                                    
 
+                                    if (l.Contains("Writing video thumbnail 41"))
+                                    {
+
+                                        title = l.Replace("[info] Writing video thumbnail 41 to: ", "");
+                                        title = Path.GetFileName(title);
+                                        title = title.Replace(".webp", "");
+                                    }
+                                    
+                                    if (MiB.Value.Contains("MiB") && n == 0 && !youtubelive.Contains("youtube_live_chat"))
+                                    {
+                                        List<object> lis = new List<object>();
+                                        que.Items.RemoveAt(0);
+                                        foreach (var _item in que.Items)
+                                        {
+
+                                            lis.Add(_item);
+                                            Debug.WriteLine($"list\n{_item}");
+                                        }
+                                        que.Items.Clear();
+
+                                        que.Items.Add((new { url = title, Size = M, ETA = ETA.Value }));
+                                        foreach (var _item in lis)
+                                        {
+                                            Debug.WriteLine(_item);
+                                            que.Items.Add(_item);
+                                        }
+
+
+
+
+                                        n++;
+                                    }
+                                    else if (GiB.Value.Contains("GiB") && n == 0 && !youtubelive.Contains("youtube_live_chat"))
+                                    {
+                                        List<object> lis = new List<object>();
+                                        que.Items.RemoveAt(0);
+                                        foreach (var _item in que.Items)
+                                        {
+
+                                            lis.Add(_item);
+                                            Debug.WriteLine($"list\n{_item}");
+                                        }
+                                        que.Items.Clear();
+
+                                        que.Items.Add((new { url = title, Size = G, ETA = ETA.Value }));
+                                         foreach (var _item in lis)
+                                         {
+                                            Debug.WriteLine(_item);
+                                            que.Items.Add(_item);
+                                         }
+
+
+                                        n++;
+                                    }
+
+
+
+                                    Debug.WriteLine(l);
                                     string per = l.Substring(0, l.IndexOf("%") + 1);
                                     if (per.Contains("%"))
                                     {
@@ -212,38 +294,11 @@ namespace youtube_dl_GUI
                                         prog.Value = perc;
                                         prog_label.Content = perc + "%";
                                     }
-                                    Match GiB = Regex.Match(l, @"\d{0,999999}.\d{0,999999}(GiB)", RegexOptions.IgnoreCase);
-                                    Match MiB = Regex.Match(l, @"\d{0,999999}.\d{0,999999}(MiB)+(?!/)", RegexOptions.IgnoreCase);
-                                    string M = MiB.Value;
-                                    string G = GiB.Value;
-                                    if (M.Contains("MiB") && n == 0)
-                                    {
-                                        M = M.Replace(" at", "");
-                                        foreach (var li in que.Items)
-                                        {
-                                            que.Items.RemoveAt(0);
-                                            que.Items.Add(new { url = li, Size = M });
-                                            break;
-                                        }
 
-                                        n++;
-                                    }
-                                    if (G.Contains("GiB") && n == 0)
-                                    {
-                                        G = G.Replace(" at", "");
-                                        foreach (var li in que.Items)
-                                        {
-                                            que.Items.RemoveAt(0);
-                                            que.Items.Add(new { url = li, Size = G });
-                                            break;
-                                        }
-
-                                        n++;
-                                    }
                                     label1.Content = ($"{l}");
                                 }));
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
 
                             }
@@ -267,13 +322,21 @@ namespace youtube_dl_GUI
 
         private void soundplayer()
         {
-            //オーディオリソースを取り出す
-            System.IO.Stream strm = Properties.Resources.end;
-            //同期再生する
-            System.Media.SoundPlayer player = new System.Media.SoundPlayer(strm);
-            player.Play();
-            //後始末
-            player.Dispose();
+            if(toggle1.IsOn == true)
+            {
+                //オーディオリソースを取り出す
+                System.IO.Stream strm = Properties.Resources.end;
+                //同期再生する
+                System.Media.SoundPlayer player = new System.Media.SoundPlayer(strm);
+                player.Play();
+                //後始末
+                player.Dispose();
+            }
+            else
+            {
+
+            }
+            ;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -286,15 +349,12 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
                 //プロセスを強制的に終了させる
                 p.Kill();
             }
+            que.Items.Clear();
             MessageBox.Show("キャンセルされました。", "Infomation", MessageBoxButton.OK, MessageBoxImage.Information);
             run.IsEnabled = true;
         }
 
-        private void SettingItem_Click(object sender, RoutedEventArgs e)
-        {
-            setting s = new setting();
-            s.Show();
-        }
+
         private void HelpItem_Click(object sender, RoutedEventArgs e)
         {
             string url = "https://toaru-web.net/2022/01/06/yt-dlp_gui/";
@@ -309,7 +369,10 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
         private void Q_Click(object sender, RoutedEventArgs e)
         {
             if (u.Text.Contains("https"))
-                que.Items.Add(u.Text);
+            {
+                que.Items.Add(new { url = u.Text, Size = "" });
+
+            }
         }
 
         private void Clear_Click(object sender, RoutedEventArgs e)
@@ -320,6 +383,173 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
         private void que_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            // ダイアログのインスタンスを生成
+            var dialog = new CommonOpenFileDialog()
+            {
+                IsFolderPicker = true
+
+            };
+            // ダイアログを表示
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                StreamWriter sm = new StreamWriter(Path.GetTempPath() + "\\" + "Path.txt", false);
+                sm.Write($"{dialog.FileName}");
+                sm.Close();
+                save.Text = "";
+                load();
+                load2();
+            }
+        }
+        private void load2()
+        {
+
+           
+
+        }
+        private void load()
+        {
+            if (!File.Exists(Path.GetTempPath() + "\\" + "sound.txt"))
+            {
+                FileStream fs = File.Create(Path.GetTempPath() + "\\" + "sound.txt");
+                fs.Close();
+            }
+
+            StreamReader so = new StreamReader(Path.GetTempPath() + "\\" + "sound.txt");
+                string sound = so.ReadToEnd();
+                if (sound == "on")
+                {
+                    toggle1.IsOn = true;
+                }
+                else if (sound == "off")
+                {
+                    toggle1.IsOn = false;
+                }
+                so.Close();
+
+                if (!File.Exists(Path.GetTempPath() + "\\" + "Path.txt"))
+                {
+                    FileStream fs = File.Create(Path.GetTempPath() + "\\" + "Path.txt");
+                    fs.Close();
+                }
+                StreamReader sr = new StreamReader(Path.GetTempPath() + "\\" + "Path.txt");
+                string path = sr.ReadToEnd();
+                save.Text = path;
+                sr.Close();
+
+                if (!File.Exists(Path.GetTempPath() + "\\" + "switch.txt"))
+                {
+                    FileStream fs = File.Create(Path.GetTempPath() + "\\" + "switch.txt");
+                    fs.Close();
+                }
+                StreamReader sr2 = new StreamReader(Path.GetTempPath() + "\\" + "switch.txt");
+                string mkv_mp4 = sr2.ReadToEnd();
+                if (mkv_mp4 == "mp4")
+                {
+                    mp4.IsChecked = true;
+                }
+                else if (mkv_mp4 == "mkv")
+                {
+                    mkv.IsChecked = true;
+                }
+                sr2.Close();
+
+                if (!File.Exists(Path.GetTempPath() + "\\" + "toggle.txt"))
+                {
+                    FileStream fs = File.Create(Path.GetTempPath() + "\\" + "toggle.txt");
+                    fs.Close();
+                }
+                StreamReader sr1 = new StreamReader(Path.GetTempPath() + "\\" + "toggle.txt");
+
+                string toggle = sr1.ReadToEnd();
+                sr1.Close();
+                if (!File.Exists(Path.GetTempPath() + "\\" + "cmd.txt"))
+                {
+                    FileStream fs = File.Create(Path.GetTempPath() + "\\" + "cmd.txt");
+                    fs.Close();
+                }
+
+
+            
+            
+
+
+
+        }
+        private void mp4_mkv()
+        {
+            
+
+            StreamWriter sm2 = new StreamWriter(Path.GetTempPath() + "\\" + "switch.txt", false);
+
+            if (mp4.IsChecked == true)
+            {
+                sm2.Write("mp4");
+            }
+            else if (mkv.IsChecked == true)
+            {
+                sm2.Write("mkv");
+            }
+
+            sm2.Close();
+
+        }
+
+        private void soundonoff()
+        {
+
+            try
+            {
+                StreamWriter soundWriter = new StreamWriter(Path.GetTempPath() + "\\" + "sound.txt", false);
+
+                if (toggle1.IsOn == true)
+                {
+                    soundWriter.Write("on");
+                }
+                else if (toggle1.IsOn == false)
+                {
+                    soundWriter.Write("off");
+                }
+
+                soundWriter.Close();
+            }catch(Exception)
+            {
+
+            }            
+
+        }
+
+        private void mp4_Checked(object sender, RoutedEventArgs e)
+        {
+           
+        }
+
+        private void mkv_Checked(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void advance_Checked(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void Grid_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            
+        }
+
+        private void toggle1_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+          
+        }
+
+        private void toggle1_Toggled(object sender, RoutedEventArgs e)
+        {
+            soundonoff();
         }
     }
 }
