@@ -53,7 +53,7 @@ namespace youtube_dl_GUI
             string replacement = "";
             Regex regEx = new Regex(pattern);
             string sanitized = Regex.Replace(regEx.Replace(url, replacement), @"\s+", " ");
-            DateTime time1 = DateTime.Parse("2022/02/10 18:18:00");
+            DateTime time1 = DateTime.Parse("2022/02/14 16:00:00");
             DateTime time2 = DateTime.Parse(sanitized);
             if (time1.Date < time2.Date)
             {
@@ -225,12 +225,13 @@ namespace youtube_dl_GUI
                                     object G = GiB.Value;
                                     
 
-                                    if (l.Contains("Writing video thumbnail 41"))
+                                    if (l.Contains("[download] Destination"))
                                     {
 
-                                        title = l.Replace("[info] Writing video thumbnail 41 to: ", "");
-                                        title = Path.GetFileName(title);
-                                        title = title.Replace(".webp", "");
+                                        title = l.Replace("[download] Destination: ", "");
+                                        title = System.IO.Path.GetFileNameWithoutExtension(title);
+                                        title = System.IO.Path.GetFileNameWithoutExtension(title);
+                                        //title = title.Replace(".webp", "");
                                     }
                                     
                                     if (MiB.Value.Contains("MiB") && n == 0 && !youtubelive.Contains("youtube_live_chat"))
