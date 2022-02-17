@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:youtube_dl_GUI"
         xmlns:Wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" x:Class="youtube_dl_GUI.MainWindow"
         mc:Ignorable="d"
-        Title="動画ダウンローダー(yt-dlp)" Height="499" Width="888" MinWidth="888" MinHeight="499">
+        Title="動画ダウンローダー(yt-dlp)" Height="636" Width="998" MinWidth="998" MinHeight="636">
     <Window.Resources>
         <Style x:Key="WatermarkTextbox" TargetType="{x:Type TextBox}">
             <Setter Property="Template">
@@ -27,36 +27,38 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <Grid IsEnabledChanged="Grid_IsEnabledChanged">
+    <Grid IsEnabledChanged="Grid_IsEnabledChanged" Margin="0,0,0,3">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="6*"/>
-            <ColumnDefinition Width="55*"/>
-            <ColumnDefinition Width="343*"/>
-            <ColumnDefinition Width="39*"/>
-            <ColumnDefinition Width="26*"/>
-            <ColumnDefinition Width="171*"/>
-            <ColumnDefinition Width="115*"/>
-            <ColumnDefinition Width="90*"/>
-            <ColumnDefinition Width="43*"/>
+            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="361*"/>
+            <ColumnDefinition Width="86*"/>
+            <ColumnDefinition Width="44*"/>
+            <ColumnDefinition Width="29*"/>
+            <ColumnDefinition Width="192*"/>
+            <ColumnDefinition Width="129*"/>
+            <ColumnDefinition Width="101*"/>
+            <ColumnDefinition Width="48*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="88*"/>
-            <RowDefinition Height="40*"/>
-            <RowDefinition Height="47*"/>
-            <RowDefinition Height="149*"/>
-            <RowDefinition Height="61*"/>
-            <RowDefinition Height="47*"/>
-            <RowDefinition Height="52*"/>
+            <RowDefinition Height="69*"/>
+            <RowDefinition Height="44*"/>
+            <RowDefinition Height="35*"/>
+            <RowDefinition Height="16*"/>
+            <RowDefinition Height="60*"/>
+            <RowDefinition Height="190*"/>
+            <RowDefinition Height="78*"/>
+            <RowDefinition Height="60*"/>
+            <RowDefinition Height="66*"/>
         </Grid.RowDefinitions>
-        <Label x:Name="label1" Content="ここにログが表示されます。" Margin="5,5,10,0" Grid.ColumnSpan="8" Grid.Row="1" Grid.Column="1" Background="#FFA2C990" Height="25" VerticalAlignment="Top"/>
-        <Button x:Name="run" Content="取得" Margin="0,5,7,0" Click="button1_Click" Grid.Row="6" Height="32" VerticalAlignment="Top" Grid.Column="2" HorizontalAlignment="Right" Width="86" Grid.ColumnSpan="3"/>
+        <Label x:Name="label1" Content="ここにログが表示されます。" Margin="5,10,10,6" Grid.ColumnSpan="8" Grid.Column="1" Background="#FFA2C990" Grid.RowSpan="2" Grid.Row="1"/>
+        <Button x:Name="run" Content="取得" Margin="0,0,7,29" Click="button1_Click" Grid.Row="8" Grid.Column="2" HorizontalAlignment="Right" Width="86" Grid.ColumnSpan="3" Height="32" VerticalAlignment="Bottom"/>
         <Menu Height="32" VerticalAlignment="Top" Grid.ColumnSpan="9">
             <MenuItem Header="Help(_H)" Click="HelpItem_Click" Height="32"/>
         </Menu>
-        <Button x:Name="cancel" Content="キャンセル" Margin="6,5,0,0" Grid.Row="6" VerticalAlignment="Top" Grid.Column="5" Click="Button_Click" Height="32" HorizontalAlignment="Left" Width="96"/>
-        <Grid Margin="5,0,0,0" Grid.Row="6" HorizontalAlignment="Left" Width="185" Height="31" VerticalAlignment="Center" Grid.Column="1" Grid.ColumnSpan="2">
-            <Label x:Name="prog_label" Content="0%" Margin="147,1,-9,4" FontSize="14"/>
-            <ProgressBar x:Name="prog" Height="31" VerticalAlignment="Bottom" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Width="142">
+        <Button x:Name="cancel" Content="キャンセル" Margin="6,0,0,29" Grid.Row="8" VerticalAlignment="Bottom" Grid.Column="5" Click="Button_Click" Height="32" HorizontalAlignment="Left" Width="96"/>
+        <Grid Grid.Column="1" HorizontalAlignment="Left" Margin="5,0,0,17" Grid.Row="8" Width="194" Height="31" VerticalAlignment="Bottom">
+            <Label x:Name="prog_label" Content="0%" FontSize="14" Margin="147,1,0,4" HorizontalAlignment="Left" Width="47"/>
+            <ProgressBar x:Name="prog" Height="31" RenderTransformOrigin="0.5,0.5" Width="142" VerticalAlignment="Center" HorizontalAlignment="Left">
                 <ProgressBar.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform ScaleY="-1"/>
@@ -66,12 +68,14 @@
                     </TransformGroup>
                 </ProgressBar.RenderTransform>
             </ProgressBar>
+
+
         </Grid>
 
 
-        <Button x:Name="Q" Grid.Column="7" Content="キューに追加" Margin="0,0,10,0" Grid.Row="6" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="106" Click="Q_Click" Grid.ColumnSpan="2"/>
-        <Button x:Name="Clear" Grid.Column="7" Content="クリア" Margin="0,0,10,30" Grid.Row="5" HorizontalAlignment="Right" Width="106" Cursor="Hand" Click="Clear_Click" Height="27" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
-        <ListView x:Name="que" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="8" Margin="10,7,5,10" Grid.RowSpan="3" SelectionChanged="que_SelectionChanged">
+        <Button x:Name="Q" Grid.Column="7" Content="キューに追加" Margin="0,0,10,0" Grid.Row="8" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="106" Click="Q_Click" Grid.ColumnSpan="2"/>
+        <Button x:Name="Clear" Grid.Column="7" Content="クリア" Margin="0,0,10,30" Grid.Row="8" HorizontalAlignment="Right" Width="106" Cursor="Hand" Click="Clear_Click" Height="27" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
+        <ListView x:Name="que" Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="3" Margin="10,7,10,10" Grid.RowSpan="3" SelectionChanged="que_SelectionChanged">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="URL" DisplayMemberBinding="{Binding url}" Width="300"/>
@@ -80,15 +84,24 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Grid Grid.Column="1" Grid.ColumnSpan="3" Height="27" Margin="10,37,3,0" Grid.RowSpan="2" Grid.Row="1" VerticalAlignment="Top">
+        <Grid Grid.Column="1" Grid.ColumnSpan="3" Height="27" Margin="10,2,3,0" Grid.RowSpan="2" Grid.Row="3" VerticalAlignment="Top">
             <TextBox x:Name="save" TextWrapping="Wrap" Height="26" VerticalAlignment="Center" Margin="45,0,42,0"/>
             <Label Content="保存先" Width="45" Height="27" VerticalAlignment="Top" HorizontalAlignment="Left"/>
             <Button Content="..." Click="Button_Click_2" Height="19" VerticalAlignment="Center" FontWeight="Normal" Cursor="Hand" HorizontalAlignment="Right" Width="34"/>
         </Grid>
-        <RadioButton x:Name="mp4" Content="MP4で保存" Checked="mp4_Checked" Height="19" VerticalAlignment="Top" Margin="14,5,93,0" Grid.Column="4" Grid.ColumnSpan="2" Grid.Row="2"/>
-        <RadioButton x:Name="mkv" Content="MKVで保存" Checked="mkv_Checked" Height="19" VerticalAlignment="Top" Margin="83,5,0,0" Grid.Column="5" Grid.Row="2"/>
-        <TextBox x:Name="u" Style="{StaticResource WatermarkTextbox}" Grid.Column="1" Grid.ColumnSpan="8" Margin="4,37,10,10" TextWrapping="Wrap" Tag="URLを入力してください"/>
-        <mah:ToggleSwitch Name="toggle1" Grid.Column="6" Height="52" Header="終了通知音" Margin="5,35,0,0" Grid.Row="1" Width="100" Grid.ColumnSpan="2" Grid.RowSpan="3" VerticalAlignment="Top" IsEnabledChanged="toggle1_IsEnabledChanged" Toggled="toggle1_Toggled"/>
+        <RadioButton x:Name="mp4" Content="MP4で保存" Checked="mp4_Checked" Height="19" VerticalAlignment="Top" Margin="10,30,212,0" Grid.Column="1" Grid.Row="4"/>
+        <RadioButton x:Name="mkv" Content="MKVで保存" Checked="mkv_Checked" Height="19" VerticalAlignment="Top" Margin="112,30,0,0" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Left" Width="130"/>
+        <TextBox x:Name="u" Style="{StaticResource WatermarkTextbox}" Grid.Column="1" Grid.ColumnSpan="8" Margin="4,37,10,0" TextWrapping="Wrap" Tag="URLを入力してください" Height="30" VerticalAlignment="Top"/>
+        <mah:ToggleSwitch Name="toggle1" Grid.Column="1" Height="50" Header="終了通知音" Margin="204,10,0,0" Grid.Row="4" Width="100" VerticalAlignment="Top" IsEnabledChanged="toggle1_IsEnabledChanged" Toggled="toggle1_Toggled" Grid.RowSpan="2"/>
+        <Wpf:WebView2 Name="wv" Grid.Column="4" Grid.ColumnSpan="5" Margin="10,10,10,10" Grid.RowSpan="4" Grid.Row="4" Source="https://toaru-web.net/2021/06/10/%e3%82%b5%e3%82%a4%e3%83%88%e4%b8%80%e8%a6%a7/"/>
+        <Button Name="video" Grid.Column="2" Content="ブラウザのURLを&#xD;&#xA;貼り付ける" Margin="1,18,1,0" Grid.Row="4" VerticalAlignment="Top" Click="video_Click" Height="42" Grid.RowSpan="2" HorizontalAlignment="Stretch"/>
+        <Grid Grid.Column="5" Margin="6,0,17,0" Grid.RowSpan="2" Grid.Row="3" Height="24" VerticalAlignment="Top">
+            <Button Content="戻る" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Click="Button_Click_1"/>
+            <Button Content="中止" HorizontalAlignment="Left" Margin="37,0,0,0" VerticalAlignment="Center" Click="Button_Click_3"/>
+            <Button Content="再読み込み" HorizontalAlignment="Left" Margin="74,0,0,0" VerticalAlignment="Center" Click="Button_Click_4"/>
+            <Button Content="進む" HorizontalAlignment="Left" Margin="139,0,0,0" VerticalAlignment="Center" Click="Button_Click_5"/>
+
+        </Grid>
 
     </Grid>
 </Controls:MetroWindow>

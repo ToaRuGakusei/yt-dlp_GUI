@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
+using Microsoft.Web.WebView2.Core;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -31,13 +32,29 @@ namespace youtube_dl_GUI
         public MainWindow()
         {
             InitializeComponent();
+            InitializeAsync();
             updateChecker();
             cancel.IsEnabled = false;
             load();
             
 
-        }
 
+
+        }
+        private async Task InitializeAsync()
+        {
+
+            await wv.EnsureCoreWebView2Async(null); // CoreWebView2初期化待ち
+            wv.CoreWebView2.NewWindowRequested += NewWindowRequested;
+        }
+        private void NewWindowRequested(object sender, CoreWebView2NewWindowRequestedEventArgs e)
+        {
+            //新しいウィンドウを開かなくする
+            e.Handled = true;
+
+            //元々のWebView2でリンク先を開く
+            wv.CoreWebView2.Navigate(e.Uri);
+        }
         private void updateChecker()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -53,7 +70,7 @@ namespace youtube_dl_GUI
             string replacement = "";
             Regex regEx = new Regex(pattern);
             string sanitized = Regex.Replace(regEx.Replace(url, replacement), @"\s+", " ");
-            DateTime time1 = DateTime.Parse("2022/02/14 16:00:00");
+            DateTime time1 = DateTime.Parse("2022/02/17 18:19:00");
             DateTime time2 = DateTime.Parse(sanitized);
             if (time1.Date < time2.Date)
             {
@@ -551,6 +568,32 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
         private void toggle1_Toggled(object sender, RoutedEventArgs e)
         {
             soundonoff();
+        }
+
+        private void video_Click(object sender, RoutedEventArgs e)
+        {
+            u.Text = wv.CoreWebView2.Source;
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            wv.GoBack();
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            wv.CoreWebView2.Stop();//中止
+        }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            wv.Reload();//再読み込み
+        }
+
+        private void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+            wv.GoForward();//進む
+
         }
     }
 }
