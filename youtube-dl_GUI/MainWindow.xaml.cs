@@ -1,13 +1,11 @@
 ﻿
+using Microsoft.Web.WebView2.Core;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
-using Microsoft.Web.WebView2.Core;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -36,7 +34,7 @@ namespace youtube_dl_GUI
             updateChecker();
             cancel.IsEnabled = false;
             load();
-            
+
 
 
 
@@ -70,7 +68,7 @@ namespace youtube_dl_GUI
             string replacement = "";
             Regex regEx = new Regex(pattern);
             string sanitized = Regex.Replace(regEx.Replace(url, replacement), @"\s+", " ");
-            DateTime time1 = DateTime.Parse("2022/02/17 18:19:00");
+            DateTime time1 = DateTime.Parse("2022/02/20 16:25:00");
             DateTime time2 = DateTime.Parse(sanitized);
             if (time1.Date < time2.Date)
             {
@@ -96,10 +94,10 @@ namespace youtube_dl_GUI
             soundonoff();
             if (u.Text.Contains("https"))
             {
-                que.Items.Add(new { url = u.Text, Size = "" ,ETA = ""});
+                que.Items.Add(new { url = u.Text, Size = "", ETA = "" });
 
             }
-            
+
             run.IsEnabled = false;
             cancel.IsEnabled = true;
 
@@ -112,7 +110,7 @@ namespace youtube_dl_GUI
 
         }
 
-        
+
         private void list()
         {
             Task task = Task.Run(() =>
@@ -143,11 +141,17 @@ namespace youtube_dl_GUI
                     int i = 0;
                     foreach (var item in que.Items)
                     {
-                        if (i == 0)
+                        string _u = DataBinder.Eval(item, "url").ToString();
+                        if (i == 0 && mp4_mkv == "mp4" ||mp4_mkv == "mkv")
                         {
                             //string t = item.ToString();
                             u.Text = DataBinder.Eval(item, "url").ToString();
-                            si = new ProcessStartInfo(@".\yt-dlp.exe", $"--format bestvideo[ext=mp4]+bestaudio[ext=m4a] --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -ciw -o \"{saveFolder}\\%(title)s\" {item} ");
+                            si = new ProcessStartInfo(@".\yt-dlp.exe", $"--format bestvideo[ext=mp4]+bestaudio[ext=m4a] --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -ciw -o \"{saveFolder}\\%(title)s\" {_u} ");
+                        }
+                        else if (i == 0 && mp4_mkv == "mp3" || mp4_mkv == "m4a")
+                        {
+                           string op = $"--ignore-errors --format bestaudio --extract-audio --audio-format {mp4_mkv} --audio-quality 160K --output \"{saveFolder}\\%(title)s.%(ext)s\" {_u}";
+                            si = new ProcessStartInfo(@".\yt-dlp.exe", $"{op}");
                         }
 
                         i++;
@@ -172,7 +176,7 @@ namespace youtube_dl_GUI
                     }
                     else
                     {
-                        si = new ProcessStartInfo(@".\yt-dlp.exe", $"--format bestvideo[ext=mp4]+bestaudio[ext=m4a] --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -ciw -o \"{saveFolder}\\%(title)s\" {URl} ");
+                        si = new ProcessStartInfo(@".\yt-dlp.exe", $" --format bestvideo[ext=mp4]+bestaudio[ext=m4a] --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -ciw -o \"{saveFolder}\\%(title)s\" {URl} ");
                     }
 
                 }
@@ -222,6 +226,7 @@ namespace youtube_dl_GUI
                         while (true)
                         {
                             var l = proc.StandardOutput.ReadLine();
+                            Debug.WriteLine(proc.StandardError.ReadLine());
                             if (l == null)
                             {
                                 break;
@@ -240,7 +245,7 @@ namespace youtube_dl_GUI
                                     Match ETA = Regex.Match(l, @"ETA \d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}", RegexOptions.IgnoreCase);
                                     object M = MiB.Value;
                                     object G = GiB.Value;
-                                    
+
 
                                     if (l.Contains("[download] Destination"))
                                     {
@@ -250,7 +255,7 @@ namespace youtube_dl_GUI
                                         title = System.IO.Path.GetFileNameWithoutExtension(title);
                                         //title = title.Replace(".webp", "");
                                     }
-                                    
+
                                     if (MiB.Value.Contains("MiB") && n == 0 && !youtubelive.Contains("youtube_live_chat"))
                                     {
                                         List<object> lis = new List<object>();
@@ -288,11 +293,11 @@ namespace youtube_dl_GUI
                                         que.Items.Clear();
 
                                         que.Items.Add((new { url = title, Size = G, ETA = ETA.Value }));
-                                         foreach (var _item in lis)
-                                         {
+                                        foreach (var _item in lis)
+                                        {
                                             Debug.WriteLine(_item);
                                             que.Items.Add(_item);
-                                         }
+                                        }
 
 
                                         n++;
@@ -340,7 +345,7 @@ namespace youtube_dl_GUI
 
         private void soundplayer()
         {
-            if(toggle1.IsOn == true)
+            if (toggle1.IsOn == true)
             {
                 //オーディオリソースを取り出す
                 System.IO.Stream strm = Properties.Resources.end;
@@ -425,7 +430,7 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
         private void load2()
         {
 
-           
+
 
         }
         private void load()
@@ -437,79 +442,96 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
             }
 
             StreamReader so = new StreamReader(Path.GetTempPath() + "\\" + "sound.txt");
-                string sound = so.ReadToEnd();
-                if (sound == "on")
-                {
-                    toggle1.IsOn = true;
-                }
-                else if (sound == "off")
-                {
-                    toggle1.IsOn = false;
-                }
-                so.Close();
+            string sound = so.ReadToEnd();
+            if (sound == "on")
+            {
+                toggle1.IsOn = true;
+            }
+            else if (sound == "off")
+            {
+                toggle1.IsOn = false;
+            }
+            so.Close();
 
-                if (!File.Exists(Path.GetTempPath() + "\\" + "Path.txt"))
-                {
-                    FileStream fs = File.Create(Path.GetTempPath() + "\\" + "Path.txt");
-                    fs.Close();
-                }
-                StreamReader sr = new StreamReader(Path.GetTempPath() + "\\" + "Path.txt");
-                string path = sr.ReadToEnd();
-                save.Text = path;
-                sr.Close();
+            if (!File.Exists(Path.GetTempPath() + "\\" + "Path.txt"))
+            {
+                FileStream fs = File.Create(Path.GetTempPath() + "\\" + "Path.txt");
+                fs.Close();
+            }
+            StreamReader sr = new StreamReader(Path.GetTempPath() + "\\" + "Path.txt");
+            string path = sr.ReadToEnd();
+            save.Text = path;
+            sr.Close();
 
-                if (!File.Exists(Path.GetTempPath() + "\\" + "switch.txt"))
-                {
-                    FileStream fs = File.Create(Path.GetTempPath() + "\\" + "switch.txt");
-                    fs.Close();
-                }
-                StreamReader sr2 = new StreamReader(Path.GetTempPath() + "\\" + "switch.txt");
-                string mkv_mp4 = sr2.ReadToEnd();
-                if (mkv_mp4 == "mp4")
-                {
-                    mp4.IsChecked = true;
-                }
-                else if (mkv_mp4 == "mkv")
-                {
-                    mkv.IsChecked = true;
-                }
-                sr2.Close();
+            if (!File.Exists(Path.GetTempPath() + "\\" + "switch.txt"))
+            {
+                FileStream fs = File.Create(Path.GetTempPath() + "\\" + "switch.txt");
+                fs.Close();
+            }
+            StreamReader sr2 = new StreamReader(Path.GetTempPath() + "\\" + "switch.txt");
+            string mkv_mp4 = sr2.ReadToEnd();
+            if (mkv_mp4 == "mp4")
+            {
+                mp4.IsSelected = true;
+            }
+            else if (mkv_mp4 == "mkv")
+            {
+                mkv.IsSelected = true;
+            }
+            else if (mkv_mp4 == "mp3")
+            {
+                mp3.IsSelected = true;
+            }
+            else if (mkv_mp4 == "m4a")
+            {
+                m4a.IsSelected = true;
+            }
+            sr2.Close();
 
-                if (!File.Exists(Path.GetTempPath() + "\\" + "toggle.txt"))
-                {
-                    FileStream fs = File.Create(Path.GetTempPath() + "\\" + "toggle.txt");
-                    fs.Close();
-                }
-                StreamReader sr1 = new StreamReader(Path.GetTempPath() + "\\" + "toggle.txt");
+            if (!File.Exists(Path.GetTempPath() + "\\" + "toggle.txt"))
+            {
+                FileStream fs = File.Create(Path.GetTempPath() + "\\" + "toggle.txt");
+                fs.Close();
+            }
+            StreamReader sr1 = new StreamReader(Path.GetTempPath() + "\\" + "toggle.txt");
 
-                string toggle = sr1.ReadToEnd();
-                sr1.Close();
-                if (!File.Exists(Path.GetTempPath() + "\\" + "cmd.txt"))
-                {
-                    FileStream fs = File.Create(Path.GetTempPath() + "\\" + "cmd.txt");
-                    fs.Close();
-                }
+            string toggle = sr1.ReadToEnd();
+            sr1.Close();
+            if (!File.Exists(Path.GetTempPath() + "\\" + "cmd.txt"))
+            {
+                FileStream fs = File.Create(Path.GetTempPath() + "\\" + "cmd.txt");
+                fs.Close();
+            }
 
 
-            
-            
+
+
 
 
 
         }
         private void mp4_mkv()
         {
-            
+
 
             StreamWriter sm2 = new StreamWriter(Path.GetTempPath() + "\\" + "switch.txt", false);
 
-            if (mp4.IsChecked == true)
+            if (mp4.IsSelected == true)
             {
                 sm2.Write("mp4");
             }
-            else if (mkv.IsChecked == true)
+            else if (mkv.IsSelected == true)
             {
                 sm2.Write("mkv");
+            }
+            else if (mp3.IsSelected == true)
+            {
+                sm2.Write("mp3");
+
+            }
+            else if (m4a.IsSelected == true)
+            {
+                sm2.Write("m4a");
             }
 
             sm2.Close();
@@ -533,36 +555,37 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
                 }
 
                 soundWriter.Close();
-            }catch(Exception)
+            }
+            catch (Exception)
             {
 
-            }            
+            }
 
         }
 
         private void mp4_Checked(object sender, RoutedEventArgs e)
         {
-           
+
         }
 
         private void mkv_Checked(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void advance_Checked(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void Grid_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            
+
         }
 
         private void toggle1_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-          
+
         }
 
         private void toggle1_Toggled(object sender, RoutedEventArgs e)
