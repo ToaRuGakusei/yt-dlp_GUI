@@ -105,8 +105,7 @@
             <ComboBoxItem Name="mkv" Content="mkv（動画）"/>
             <ComboBoxItem Name="mp3" Content="mp3（音楽）"/>
             <ComboBoxItem Name="m4a" Content="m4a（音楽）"/>
-            
-
+            <ComboBoxItem Name="f" Content="flac（音楽）"/>
         </ComboBox>
 
     </Grid>

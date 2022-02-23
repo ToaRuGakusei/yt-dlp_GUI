@@ -142,7 +142,7 @@ namespace youtube_dl_GUI
                     foreach (var item in que.Items)
                     {
                         string _u = DataBinder.Eval(item, "url").ToString();
-                        if (i == 0 && mp4_mkv == "mp4" ||mp4_mkv == "mkv")
+                        if (i == 0 && mp4_mkv == "mp4" || mp4_mkv == "mkv")
                         {
                             //string t = item.ToString();
                             u.Text = DataBinder.Eval(item, "url").ToString();
@@ -150,7 +150,7 @@ namespace youtube_dl_GUI
                         }
                         else if (i == 0 && mp4_mkv == "mp3" || mp4_mkv == "m4a")
                         {
-                           string op = $"--ignore-errors --format bestaudio --extract-audio --audio-format {mp4_mkv} --audio-quality 160K --output \"{saveFolder}\\%(title)s.%(ext)s\" {_u}";
+                            string op = $"--ignore-errors --format bestaudio --extract-audio --audio-format {mp4_mkv} --audio-quality 160K --output \"{saveFolder}\\%(title)s.%(ext)s\" {_u}";
                             si = new ProcessStartInfo(@".\yt-dlp.exe", $"{op}");
                         }
 
@@ -486,6 +486,10 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
             {
                 m4a.IsSelected = true;
             }
+            else if(mkv_mp4 == "flac")
+            {
+                f.IsSelected = true;
+            }
             sr2.Close();
 
             if (!File.Exists(Path.GetTempPath() + "\\" + "toggle.txt"))
@@ -532,6 +536,11 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
             else if (m4a.IsSelected == true)
             {
                 sm2.Write("m4a");
+            }
+            else if(f.IsSelected == true)
+            {
+                sm2.Write("flac");
+
             }
 
             sm2.Close();
