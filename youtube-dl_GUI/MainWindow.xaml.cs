@@ -68,7 +68,7 @@ namespace youtube_dl_GUI
             string replacement = "";
             Regex regEx = new Regex(pattern);
             string sanitized = Regex.Replace(regEx.Replace(url, replacement), @"\s+", " ");
-            DateTime time1 = DateTime.Parse("2022/02/20 16:25:00");
+            DateTime time1 = DateTime.Parse("2022/02/25 18:30:00");
             DateTime time2 = DateTime.Parse(sanitized);
             if (time1.Date < time2.Date)
             {
@@ -142,13 +142,19 @@ namespace youtube_dl_GUI
                     foreach (var item in que.Items)
                     {
                         string _u = DataBinder.Eval(item, "url").ToString();
-                        if (i == 0 && mp4_mkv == "mp4" || mp4_mkv == "mkv")
+                        if (i == 0 && mp4_mkv == "mp4" || mp4_mkv == "mkv" || mp4_mkv == "webm")
                         {
                             //string t = item.ToString();
                             u.Text = DataBinder.Eval(item, "url").ToString();
-                            si = new ProcessStartInfo(@".\yt-dlp.exe", $"--format bestvideo[ext=mp4]+bestaudio[ext=m4a] --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -ciw -o \"{saveFolder}\\%(title)s\" {_u} ");
+                            si = new ProcessStartInfo(@".\yt-dlp.exe", $"--format bestvideo+251/bestvideo+bestaudio/best --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -ciw -o \"{saveFolder}\\%(title)s\" {_u} ");
                         }
-                        else if (i == 0 && mp4_mkv == "mp3" || mp4_mkv == "m4a")
+                        /* else if(i == 0 && mp4_mkv == "webm")
+                         {
+                             //string t = item.ToString();
+                             u.Text = DataBinder.Eval(item, "url").ToString();
+                             si = new ProcessStartInfo(@".\yt-dlp.exe", $"--format bestvideo+bestaudio --embed-subs --embed-thumbnail --all-subs --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -ciw -o \"{saveFolder}\\%(title)s\" {_u} ");
+                         }*/
+                        else if (i == 0 && mp4_mkv == "mp3" || mp4_mkv == "m4a" || mp4_mkv  == "flac")
                         {
                             string op = $"--ignore-errors --format bestaudio --extract-audio --audio-format {mp4_mkv} --audio-quality 160K --output \"{saveFolder}\\%(title)s.%(ext)s\" {_u}";
                             si = new ProcessStartInfo(@".\yt-dlp.exe", $"{op}");
@@ -185,7 +191,7 @@ namespace youtube_dl_GUI
 
             // ウィンドウ表示を完全に消したい場合
             si.CreateNoWindow = true;
-            si.RedirectStandardError = true;
+            si.RedirectStandardError = false;
             si.RedirectStandardOutput = true;
             si.UseShellExecute = false;
             using (var proc = new Process())
@@ -226,7 +232,7 @@ namespace youtube_dl_GUI
                         while (true)
                         {
                             var l = proc.StandardOutput.ReadLine();
-                            Debug.WriteLine(proc.StandardError.ReadLine());
+                            //Debug.WriteLine(proc.StandardError.ReadLine());
                             if (l == null)
                             {
                                 break;
@@ -490,6 +496,11 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
             {
                 f.IsSelected = true;
             }
+            else if(mkv_mp4 == "webm")
+            {
+                webm.IsSelected = true;
+
+            }
             sr2.Close();
 
             if (!File.Exists(Path.GetTempPath() + "\\" + "toggle.txt"))
@@ -540,6 +551,11 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
             else if(f.IsSelected == true)
             {
                 sm2.Write("flac");
+
+            }
+            else if (webm.IsSelected == true)
+            {
+                sm2.Write("webm");
 
             }
 

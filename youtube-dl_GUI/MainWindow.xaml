@@ -102,6 +102,7 @@
         </Grid>
         <ComboBox Grid.Column="1" HorizontalAlignment="Left" Margin="10,25,0,0" Grid.Row="4" VerticalAlignment="Top" Width="120">
             <ComboBoxItem Name="mp4" Content="mp4（動画）"/>
+            <ComboBoxItem Name="webm" Content="webm（動画）"/>
             <ComboBoxItem Name="mkv" Content="mkv（動画）"/>
             <ComboBoxItem Name="mp3" Content="mp3（音楽）"/>
             <ComboBoxItem Name="m4a" Content="m4a（音楽）"/>
