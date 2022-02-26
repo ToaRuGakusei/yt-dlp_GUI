@@ -90,7 +90,7 @@
             <Button Content="..." Click="Button_Click_2" Height="19" VerticalAlignment="Center" FontWeight="Normal" Cursor="Hand" HorizontalAlignment="Right" Width="34"/>
         </Grid>
         <TextBox x:Name="u" Style="{StaticResource WatermarkTextbox}" Grid.Column="1" Grid.ColumnSpan="8" Margin="4,37,10,0" TextWrapping="Wrap" Tag="URLを入力してください" Height="30" VerticalAlignment="Top"/>
-        <mah:ToggleSwitch Name="toggle1" Grid.Column="1" Height="52" Header="終了通知音" Margin="169,18,0,0" Grid.Row="4" Width="100" VerticalAlignment="Top" IsEnabledChanged="toggle1_IsEnabledChanged" Toggled="toggle1_Toggled" Grid.RowSpan="2"/>
+        <mah:ToggleSwitch Name="toggle1" Grid.Column="1" Height="52" Header="終了通知音" Margin="135,25,0,0" Grid.Row="4" Width="114" VerticalAlignment="Top" IsEnabledChanged="toggle1_IsEnabledChanged" Toggled="toggle1_Toggled" Grid.RowSpan="2"/>
         <Wpf:WebView2 Name="wv" Grid.Column="4" Grid.ColumnSpan="5" Margin="10,10,10,10" Grid.RowSpan="4" Grid.Row="4" Source="https://toaru-web.net/2021/06/10/%e3%82%b5%e3%82%a4%e3%83%88%e4%b8%80%e8%a6%a7/"/>
         <Button Name="video" Grid.Column="2" Content="ブラウザのURLを&#xD;&#xA;貼り付ける" Margin="1,18,1,0" Grid.Row="4" VerticalAlignment="Top" Click="video_Click" Height="42" Grid.RowSpan="2" HorizontalAlignment="Stretch"/>
         <Grid Grid.Column="5" Margin="6,0,17,0" Grid.RowSpan="2" Grid.Row="3" Height="24" VerticalAlignment="Top">
@@ -101,9 +101,11 @@
 
         </Grid>
         <ComboBox Grid.Column="1" HorizontalAlignment="Left" Margin="10,25,0,0" Grid.Row="4" VerticalAlignment="Top" Width="120">
-            <ComboBoxItem Name="mp4" Content="mp4（動画）"/>
-            <ComboBoxItem Name="webm" Content="webm（動画）"/>
-            <ComboBoxItem Name="mkv" Content="mkv（動画）"/>
+            <ComboBoxItem Name="mp4" Content="mp4（vp9）"/>
+            <ComboBoxItem Name="mp4_h264" Content="mp4（h264）おすすめ"/>
+            <ComboBoxItem Name="mkv" Content="mkv（vp9）"/>
+            <ComboBoxItem Name="mkv_h264" Content="mkv（h264）おすすめ"/>
+            <ComboBoxItem Name="webm" Content="webm"/>
             <ComboBoxItem Name="mp3" Content="mp3（音楽）"/>
             <ComboBoxItem Name="m4a" Content="m4a（音楽）"/>
             <ComboBoxItem Name="f" Content="flac（音楽）"/>
