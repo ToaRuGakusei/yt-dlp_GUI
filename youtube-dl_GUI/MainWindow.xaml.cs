@@ -142,21 +142,23 @@ namespace youtube_dl_GUI
                     foreach (var item in que.Items)
                     {
                         string _u = DataBinder.Eval(item, "url").ToString();
-                        if (i == 0 && mp4_mkv == "mp4" || mp4_mkv == "mkv" || mp4_mkv == "webm")
+                        if (mp4_h264.IsSelected == false && mkv_h264.IsSelected == false && i == 0 && mp4_mkv != "mp3" && mp4_mkv != "m4a" && mp4_mkv != "flac")
                         {
                             //string t = item.ToString();
                             u.Text = DataBinder.Eval(item, "url").ToString();
-                            si = new ProcessStartInfo(@".\yt-dlp.exe", $"--format bestvideo+251/bestvideo+bestaudio/best --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -ciw -o \"{saveFolder}\\%(title)s\" {_u} ");
+                            si = new ProcessStartInfo(@".\yt-dlp.exe", $"--format bestvideo+251/bestvideo+bestaudio/best --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -i -ciw -o \"{saveFolder}\\%(title)s\" {_u} ");
                         }
-                        /* else if(i == 0 && mp4_mkv == "webm")
-                         {
-                             //string t = item.ToString();
-                             u.Text = DataBinder.Eval(item, "url").ToString();
-                             si = new ProcessStartInfo(@".\yt-dlp.exe", $"--format bestvideo+bestaudio --embed-subs --embed-thumbnail --all-subs --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -ciw -o \"{saveFolder}\\%(title)s\" {_u} ");
-                         }*/
+                        else if(i == 0 && mp4_h264.IsSelected == true || mkv_h264.IsSelected == true && mp4_mkv =="mp4" || mp4_mkv == "mkv")
+                        {
+                            si = new ProcessStartInfo(@".\yt-dlp.exe", $" --format bestvideo[ext=mp4]+bestaudio[ext=m4a] --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -i -ciw -S vcodec:h264 -o \"{saveFolder}\\%(title)s\" {_u} ");
+                        }
+                       /* else if (i == 0 && mp4_h265.IsSelected == true || mkv_h265.IsSelected == true && mp4_mkv == "mp4" || mp4_mkv == "mkv")
+                        {
+                            si = new ProcessStartInfo(@".\yt-dlp.exe", $" --format bestvideo[ext=mp4]+bestaudio[ext=m4a] --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -i -ciw -S vcodec:h265 -o \"{saveFolder}\\%(title)s\" {_u} ");
+                        }*/
                         else if (i == 0 && mp4_mkv == "mp3" || mp4_mkv == "m4a" || mp4_mkv  == "flac")
                         {
-                            string op = $"--ignore-errors --format bestaudio --extract-audio --audio-format {mp4_mkv} --audio-quality 160K --output \"{saveFolder}\\%(title)s.%(ext)s\" {_u}";
+                            string op = $"--ignore-errors --format bestaudio --extract-audio --audio-format {mp4_mkv} --audio-quality 160K --output \"{saveFolder}\\%(title)s.%(ext)s\" -i {_u}";
                             si = new ProcessStartInfo(@".\yt-dlp.exe", $"{op}");
                         }
 
@@ -557,6 +559,14 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
             {
                 sm2.Write("webm");
 
+            }
+            else if(mp4_h264.IsSelected == true)
+            {
+                sm2.Write("mp4");
+            }
+            else if(mkv_h264.IsSelected==true)
+            {
+                sm2.Write("mkv");
             }
 
             sm2.Close();
