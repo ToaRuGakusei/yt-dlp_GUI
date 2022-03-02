@@ -4,8 +4,10 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO.Compression;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -68,7 +70,7 @@ namespace youtube_dl_GUI
             string replacement = "";
             Regex regEx = new Regex(pattern);
             string sanitized = Regex.Replace(regEx.Replace(url, replacement), @"\s+", " ");
-            DateTime time1 = DateTime.Parse("2022/02/26 21:34:00");
+            DateTime time1 = DateTime.Parse("2022/03/02 21:14:00");
             DateTime time2 = DateTime.Parse(sanitized);
             if (time1.Date < time2.Date)
             {
@@ -90,21 +92,55 @@ namespace youtube_dl_GUI
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            mp4_mkv();
-            soundonoff();
-            if (u.Text.Contains("https"))
+            if(!File.Exists(@".\yt-dlp.exe") && !File.Exists(@".\ffmpeg.exe") && !File.Exists(@".\ffplay.exe") && !File.Exists(@".\ffprobe.exe"))
             {
-                que.Items.Add(new { url = u.Text, Size = "", ETA = "" });
+                var ms = MessageBox.Show("ffmpegとyt-dlpをダウンロードしますか？","ダウンロード",MessageBoxButton.YesNo,MessageBoxImage.Information);
+                if(ms == MessageBoxResult.Yes)
+                {
+                    int i = 0;
+                    Directory.CreateDirectory(@".\Download");
+                    string[] Urls = new string[] { "https://github.com/yt-dlp/yt-dlp/releases/download/2022.02.04/yt-dlp.exe", "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-lgpl.zip" };
+                    foreach (string url in Urls)
+                    {
+                        if (i == 0)
+                        {
+                            downloadFileAsync(url, $".\\yt-dlp.exe");
 
+                        }
+                        else
+                        {
+                            downloadFileAsync(url, $".\\ffmpeg.zip");
+                        }
+                        i++;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("キャンセルされました。");
+                    return;
+                }
+                
             }
-
-            run.IsEnabled = false;
-            cancel.IsEnabled = true;
-
-            Task task = Task.Run(() =>
+            else
             {
-                Download();
-            });
+
+                mp4_mkv();
+                soundonoff();
+                if (u.Text.Contains("https"))
+                {
+                    que.Items.Add(new { url = u.Text, Size = "", ETA = "" });
+
+                }
+
+                run.IsEnabled = false;
+                cancel.IsEnabled = true;
+
+                Task task = Task.Run(() =>
+                {
+                    Download();
+                });
+            }
+            
 
 
 
@@ -126,6 +162,7 @@ namespace youtube_dl_GUI
         public int i = 0;
         public int n = 0;
         public string title;
+        public string ex;
         private void Download()
         {
             StreamReader sm = new StreamReader(Path.GetTempPath() + "\\" + "Path.txt");
@@ -250,21 +287,24 @@ namespace youtube_dl_GUI
                                     }
                                     Match GiB = Regex.Match(l, @"\d{0,999999}.\d{0,999999}(GiB)", RegexOptions.IgnoreCase);
                                     Match MiB = Regex.Match(l, @"\d{0,999999}.\d{0,999999}(MiB)+(?!/)", RegexOptions.IgnoreCase);
-                                    Match ETA = Regex.Match(l, @"ETA \d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}", RegexOptions.IgnoreCase);
+                                   Match ETA = Regex.Match(l, @"ETA \d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}", RegexOptions.IgnoreCase);
+                                     ETA = Regex.Match(l, @"ETA \d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}", RegexOptions.IgnoreCase);
                                     object M = MiB.Value;
                                     object G = GiB.Value;
-
+                                    DateTime dt = DateTime.Now;
+                                    //DataTime dt2 = 
+                                    //time.Content = dt.Hour + ":" + dt.Minute;
 
                                     if (l.Contains("[download] Destination"))
                                     {
 
                                         title = l.Replace("[download] Destination: ", "");
+                                        ex = Path.GetExtension(l);
                                         title = System.IO.Path.GetFileNameWithoutExtension(title);
                                         title = System.IO.Path.GetFileNameWithoutExtension(title);
-                                        //title = title.Replace(".webp", "");
                                     }
 
-                                    if (MiB.Value.Contains("MiB") && n == 0 && !youtubelive.Contains("youtube_live_chat"))
+                                    if (MiB.Value.Contains("MiB") && n == 0 && !u.Text.Contains("playlist"))
                                     {
                                         List<object> lis = new List<object>();
                                         que.Items.RemoveAt(0);
@@ -276,7 +316,7 @@ namespace youtube_dl_GUI
                                         }
                                         que.Items.Clear();
 
-                                        que.Items.Add((new { url = title, Size = M, ETA = ETA.Value }));
+                                        que.Items.Add((new { url = title, Size = M, ETA = ETA.Value ,extension = ex}));
                                         foreach (var _item in lis)
                                         {
                                             Debug.WriteLine(_item);
@@ -288,7 +328,7 @@ namespace youtube_dl_GUI
 
                                         n++;
                                     }
-                                    else if (GiB.Value.Contains("GiB") && n == 0 && !youtubelive.Contains("youtube_live_chat"))
+                                    else if (GiB.Value.Contains("GiB") && n == 0 && !u.Text.Contains("playlist"))
                                     {
                                         List<object> lis = new List<object>();
                                         que.Items.RemoveAt(0);
@@ -300,7 +340,7 @@ namespace youtube_dl_GUI
                                         }
                                         que.Items.Clear();
 
-                                        que.Items.Add((new { url = title, Size = G, ETA = ETA.Value }));
+                                        que.Items.Add((new { url = title, Size = G, ETA = ETA.Value, extension = ex }));
                                         foreach (var _item in lis)
                                         {
                                             Debug.WriteLine(_item);
@@ -311,7 +351,52 @@ namespace youtube_dl_GUI
                                         n++;
                                     }
 
+                                    if (MiB.Value.Contains("MiB") && u.Text.Contains("playlist"))
+                                    {
+                                        List<object> lis = new List<object>();
+                                        que.Items.RemoveAt(0);
+                                        foreach (var _item in que.Items)
+                                        {
 
+                                            lis.Add(_item);
+                                            Debug.WriteLine($"list\n{_item}");
+                                        }
+                                        que.Items.Clear();
+
+                                        que.Items.Add((new { url = title, Size = M, ETA = ETA.Value, extension = ex }));
+                                        foreach (var _item in lis)
+                                        {
+                                            Debug.WriteLine(_item);
+                                            que.Items.Add(_item);
+                                        }
+
+
+
+
+                                        n++;
+                                    }
+                                    else if (GiB.Value.Contains("GiB") && u.Text.Contains("playlist"))
+                                    {
+                                        List<object> lis = new List<object>();
+                                        que.Items.RemoveAt(0);
+                                        foreach (var _item in que.Items)
+                                        {
+
+                                            lis.Add(_item);
+                                            Debug.WriteLine($"list\n{_item}");
+                                        }
+                                        que.Items.Clear();
+
+                                        que.Items.Add((new { url = title, Size = G, ETA = ETA.Value, extension = ex }));
+                                        foreach (var _item in lis)
+                                        {
+                                            Debug.WriteLine(_item);
+                                            que.Items.Add(_item);
+                                        }
+
+
+                                        n++;
+                                    }
 
                                     Debug.WriteLine(l);
                                     string per = l.Substring(0, l.IndexOf("%") + 1);
@@ -593,6 +678,101 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
             }
             catch (Exception)
             {
+
+            }
+
+        }
+        private async void downloadFileAsync(string uri, string outputPath)
+        {
+
+            var client = new HttpClient();
+            HttpResponseMessage res = await client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead);
+
+            using (var fileStream = File.Create(outputPath))
+            {
+                using (var httpStream = await res.Content.ReadAsStreamAsync())
+                {
+                    httpStream.CopyTo(fileStream);
+                    fileStream.Flush();
+                    n++;
+                }
+            }
+
+
+            if (n == 2)
+            {
+                //ZIP書庫を開く
+                using (ZipArchive a = ZipFile.OpenRead(@".\ffmpeg.zip"))
+                {
+                    for(int i = 0; i <= 3; i++)
+                    {
+                        ZipArchiveEntry e;
+                        if (i == 0)
+                        {
+                             e = a.GetEntry("ffmpeg-master-latest-win64-lgpl/bin/ffmpeg.exe");
+                            if (e == null)
+                            {
+                                //見つからなかった時
+                                Console.WriteLine("ffmpeg が見つかりませんでした。");
+                            }
+                            else
+                            {
+                                //見つかった時は「C:\test\dir\1.txt」として展開する
+                                //2番目の引数をTrueにすると、上書きする
+                                e.ExtractToFile(@".\ffmpeg.exe", true);
+                            }
+                        }
+                        else if(i == 1)
+                        {
+                             e = a.GetEntry("ffmpeg-master-latest-win64-lgpl/bin/ffprobe.exe");
+                            if (e == null)
+                            {
+                                //見つからなかった時
+                                Console.WriteLine("ffmpeg が見つかりませんでした。");
+                            }
+                            else
+                            {
+                                //見つかった時は「C:\test\dir\1.txt」として展開する
+                                //2番目の引数をTrueにすると、上書きする
+                                e.ExtractToFile(@".\ffprobe.exe", true);
+                            }
+                        }
+                        else
+                        {
+                             e = a.GetEntry("ffmpeg-master-latest-win64-lgpl/bin/ffplay.exe");
+                            if (e == null)
+                            {
+                                //見つからなかった時
+                                Console.WriteLine("ffmpeg が見つかりませんでした。");
+                            }
+                            else
+                            {
+                                //見つかった時は「C:\test\dir\1.txt」として展開する
+                                //2番目の引数をTrueにすると、上書きする
+                                e.ExtractToFile(@".\ffplay.exe", true);
+                            }
+
+                        }
+                        
+                    }
+
+                    
+                }
+                mp4_mkv();
+                soundonoff();
+                if (u.Text.Contains("https"))
+                {
+                    que.Items.Add(new { url = u.Text, Size = "", ETA = "" });
+
+                }
+
+                run.IsEnabled = false;
+                cancel.IsEnabled = true;
+
+                Task task = Task.Run(() =>
+                {
+                    Download();
+                });
 
             }
 

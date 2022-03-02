@@ -79,6 +79,7 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="URL" DisplayMemberBinding="{Binding url}" Width="300"/>
+                    <GridViewColumn Header="拡張子" DisplayMemberBinding="{Binding extension}" Width="80"/>
                     <GridViewColumn Header="ファイルサイズ" DisplayMemberBinding="{Binding Size}" Width="80"/>
                     <GridViewColumn Header="予想時間" DisplayMemberBinding="{Binding ETA}" Width="80"/>
                 </GridView>
