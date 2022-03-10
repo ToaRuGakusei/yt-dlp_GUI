@@ -1,11 +1,10 @@
-﻿
-using Microsoft.Web.WebView2.Core;
+﻿using Microsoft.Web.WebView2.Core;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO.Compression;
 using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -43,7 +42,7 @@ namespace youtube_dl_GUI
         }
         private async Task InitializeAsync()
         {
-
+            //新しいタブで開かないようにする。
             await wv.EnsureCoreWebView2Async(null); // CoreWebView2初期化待ち
             wv.CoreWebView2.NewWindowRequested += NewWindowRequested;
         }
@@ -57,7 +56,7 @@ namespace youtube_dl_GUI
         }
         private void updateChecker()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
+            //自分のサイトから日時を引っ張ってくる
             WebClient wc = new WebClient();
             StreamReader sm = new StreamReader(wc.OpenRead("https://toaru-web.net/2022/01/06/yt-dlp_gui/"));
             string html = sm.ReadToEnd();
@@ -70,7 +69,7 @@ namespace youtube_dl_GUI
             string replacement = "";
             Regex regEx = new Regex(pattern);
             string sanitized = Regex.Replace(regEx.Replace(url, replacement), @"\s+", " ");
-            DateTime time1 = DateTime.Parse("2022/03/02 21:14:00");
+            DateTime time1 = DateTime.Parse("2022/03/10 21:12:00");
             DateTime time2 = DateTime.Parse(sanitized);
             if (time1.Date < time2.Date)
             {
@@ -92,13 +91,14 @@ namespace youtube_dl_GUI
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            if(!File.Exists(@".\yt-dlp.exe") && !File.Exists(@".\ffmpeg.exe") && !File.Exists(@".\ffplay.exe") && !File.Exists(@".\ffprobe.exe"))
+            
+            //ffmpegとyt-dlpをダウンロードする。
+            if (!File.Exists(@".\yt-dlp.exe") && !File.Exists(@".\ffmpeg.exe") && !File.Exists(@".\ffplay.exe") && !File.Exists(@".\ffprobe.exe"))
             {
-                var ms = MessageBox.Show("ffmpegとyt-dlpをダウンロードしますか？","ダウンロード",MessageBoxButton.YesNo,MessageBoxImage.Information);
-                if(ms == MessageBoxResult.Yes)
+                var ms = MessageBox.Show("ffmpegとyt-dlpをダウンロードしますか？", "ダウンロード", MessageBoxButton.YesNo, MessageBoxImage.Information);
+                if (ms == MessageBoxResult.Yes)
                 {
                     int i = 0;
-                    Directory.CreateDirectory(@".\Download");
                     string[] Urls = new string[] { "https://github.com/yt-dlp/yt-dlp/releases/download/2022.02.04/yt-dlp.exe", "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-lgpl.zip" };
                     foreach (string url in Urls)
                     {
@@ -119,13 +119,14 @@ namespace youtube_dl_GUI
                     MessageBox.Show("キャンセルされました。");
                     return;
                 }
-                
+
             }
             else
             {
 
                 mp4_mkv();
                 soundonoff();
+                //
                 if (u.Text.Contains("https"))
                 {
                     que.Items.Add(new { url = u.Text, Size = "", ETA = "" });
@@ -140,7 +141,7 @@ namespace youtube_dl_GUI
                     Download();
                 });
             }
-            
+
 
 
 
@@ -149,6 +150,7 @@ namespace youtube_dl_GUI
 
         private void list()
         {
+            //queからuriを取得する。
             Task task = Task.Run(() =>
             {
                 if (que.Items.Count > 0)
@@ -165,6 +167,7 @@ namespace youtube_dl_GUI
         public string ex;
         private void Download()
         {
+            //txtから設定を取得する。
             StreamReader sm = new StreamReader(Path.GetTempPath() + "\\" + "Path.txt");
             string saveFolder = sm.ReadToEnd();
             StreamReader sm3 = new StreamReader(Path.GetTempPath() + "\\" + "switch.txt");
@@ -173,6 +176,7 @@ namespace youtube_dl_GUI
             sm3.Close();
             this.Dispatcher.Invoke((Action)(() =>
             {
+                //
                 if (que.Items.Count > 0)
                 {
                     int i = 0;
@@ -181,19 +185,14 @@ namespace youtube_dl_GUI
                         string _u = DataBinder.Eval(item, "url").ToString();
                         if (mp4_h264.IsSelected == false && mkv_h264.IsSelected == false && i == 0 && mp4_mkv != "mp3" && mp4_mkv != "m4a" && mp4_mkv != "flac")
                         {
-                            //string t = item.ToString();
                             u.Text = DataBinder.Eval(item, "url").ToString();
                             si = new ProcessStartInfo(@".\yt-dlp.exe", $"--format bestvideo+251/bestvideo+bestaudio/best --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -i -ciw -o \"{saveFolder}\\%(title)s\" {_u} ");
                         }
-                        else if(i == 0 && mp4_h264.IsSelected == true || mkv_h264.IsSelected == true && mp4_mkv =="mp4" || mp4_mkv == "mkv")
+                        else if (i == 0 && mp4_h264.IsSelected == true || mkv_h264.IsSelected == true && mp4_mkv == "mp4" || mp4_mkv == "mkv")
                         {
                             si = new ProcessStartInfo(@".\yt-dlp.exe", $" --format bestvideo[ext=mp4]+bestaudio[ext=m4a] --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -i -ciw -S vcodec:h264 -o \"{saveFolder}\\%(title)s\" {_u} ");
                         }
-                       /* else if (i == 0 && mp4_h265.IsSelected == true || mkv_h265.IsSelected == true && mp4_mkv == "mp4" || mp4_mkv == "mkv")
-                        {
-                            si = new ProcessStartInfo(@".\yt-dlp.exe", $" --format bestvideo[ext=mp4]+bestaudio[ext=m4a] --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -i -ciw -S vcodec:h265 -o \"{saveFolder}\\%(title)s\" {_u} ");
-                        }*/
-                        else if (i == 0 && mp4_mkv == "mp3" || mp4_mkv == "m4a" || mp4_mkv  == "flac")
+                        else if (i == 0 && mp4_mkv == "mp3" || mp4_mkv == "m4a" || mp4_mkv == "flac")
                         {
                             string op = $"--ignore-errors --format bestaudio --extract-audio --audio-format {mp4_mkv} --audio-quality 160K --output \"{saveFolder}\\%(title)s.%(ext)s\" -i {_u}";
                             si = new ProcessStartInfo(@".\yt-dlp.exe", $"{op}");
@@ -209,8 +208,6 @@ namespace youtube_dl_GUI
                     if (File.Exists(Path.GetTempPath() + "\\" + "cmd.txt"))
                     {
                         StreamReader sm2 = new StreamReader(Path.GetTempPath() + "\\" + "cmd.txt");
-
-                        //string toggle = sm1.ReadToEnd();
                         cmd = sm2.ReadToEnd();
                         sm2.Close();
                     }
@@ -256,6 +253,12 @@ namespace youtube_dl_GUI
                         if (que.Items.Count == 0)
                         {
                             soundplayer();
+                            if(c == true)
+                            {
+                                MessageBox.Show("キャンセルされました。", "キャンセル", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                            }
+                            else
                             MessageBox.Show("ダウンロードが終了しました。", "終了", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
 
@@ -271,7 +274,6 @@ namespace youtube_dl_GUI
                         while (true)
                         {
                             var l = proc.StandardOutput.ReadLine();
-                            //Debug.WriteLine(proc.StandardError.ReadLine());
                             if (l == null)
                             {
                                 break;
@@ -287,14 +289,15 @@ namespace youtube_dl_GUI
                                     }
                                     Match GiB = Regex.Match(l, @"\d{0,999999}.\d{0,999999}(GiB)", RegexOptions.IgnoreCase);
                                     Match MiB = Regex.Match(l, @"\d{0,999999}.\d{0,999999}(MiB)+(?!/)", RegexOptions.IgnoreCase);
-                                   Match ETA = Regex.Match(l, @"ETA \d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}", RegexOptions.IgnoreCase);
-                                     ETA = Regex.Match(l, @"ETA \d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}", RegexOptions.IgnoreCase);
+                                    Match ETA = Regex.Match(l, @"ETA \d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}", RegexOptions.IgnoreCase);
+                                    ETA = Regex.Match(l, @"ETA \d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}", RegexOptions.IgnoreCase);
+                                    if (ETA == null)
+                                    {
+                                        ETA = Regex.Match(l, @"ETA \d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}", RegexOptions.IgnoreCase);
+                                        ETA = Regex.Match(l, @"ETA \d{0,999999}\d{0,999999}:\d{0,999999}\d{0,999999}", RegexOptions.IgnoreCase);
+                                    }
                                     object M = MiB.Value;
                                     object G = GiB.Value;
-                                    DateTime dt = DateTime.Now;
-                                    //DataTime dt2 = 
-                                    //time.Content = dt.Hour + ":" + dt.Minute;
-
                                     if (l.Contains("[download] Destination"))
                                     {
 
@@ -316,7 +319,7 @@ namespace youtube_dl_GUI
                                         }
                                         que.Items.Clear();
 
-                                        que.Items.Add((new { url = title, Size = M, ETA = ETA.Value ,extension = ex}));
+                                        que.Items.Add((new { url = title, Size = M, ETA = ETA.Value, extension = ex }));
                                         foreach (var _item in lis)
                                         {
                                             Debug.WriteLine(_item);
@@ -441,7 +444,7 @@ namespace youtube_dl_GUI
             if (toggle1.IsOn == true)
             {
                 //オーディオリソースを取り出す
-                System.IO.Stream strm = Properties.Resources.end;
+                System.IO.Stream strm = yt_dlp_GUI.Properties.Resources.end;
                 //同期再生する
                 System.Media.SoundPlayer player = new System.Media.SoundPlayer(strm);
                 player.Play();
@@ -454,7 +457,7 @@ namespace youtube_dl_GUI
             }
             ;
         }
-
+        private bool c;
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process[] ps =
@@ -466,8 +469,9 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
                 p.Kill();
             }
             que.Items.Clear();
-            MessageBox.Show("キャンセルされました。", "Infomation", MessageBoxButton.OK, MessageBoxImage.Information);
+            c = true;
             run.IsEnabled = true;
+
         }
 
 
@@ -517,14 +521,7 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
                 sm.Close();
                 save.Text = "";
                 load();
-                load2();
             }
-        }
-        private void load2()
-        {
-
-
-
         }
         private void load()
         {
@@ -579,11 +576,11 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
             {
                 m4a.IsSelected = true;
             }
-            else if(mkv_mp4 == "flac")
+            else if (mkv_mp4 == "flac")
             {
                 f.IsSelected = true;
             }
-            else if(mkv_mp4 == "webm")
+            else if (mkv_mp4 == "webm")
             {
                 webm.IsSelected = true;
 
@@ -635,7 +632,7 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
             {
                 sm2.Write("m4a");
             }
-            else if(f.IsSelected == true)
+            else if (f.IsSelected == true)
             {
                 sm2.Write("flac");
 
@@ -645,11 +642,11 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
                 sm2.Write("webm");
 
             }
-            else if(mp4_h264.IsSelected == true)
+            else if (mp4_h264.IsSelected == true)
             {
                 sm2.Write("mp4");
             }
-            else if(mkv_h264.IsSelected==true)
+            else if (mkv_h264.IsSelected == true)
             {
                 sm2.Write("mkv");
             }
@@ -696,7 +693,7 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
                     fileStream.Flush();
                     n++;
                 }
-            }
+            }                                                      
 
 
             if (n == 2)
@@ -704,12 +701,12 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
                 //ZIP書庫を開く
                 using (ZipArchive a = ZipFile.OpenRead(@".\ffmpeg.zip"))
                 {
-                    for(int i = 0; i <= 3; i++)
+                    for (int i = 0; i <= 3; i++)
                     {
                         ZipArchiveEntry e;
                         if (i == 0)
                         {
-                             e = a.GetEntry("ffmpeg-master-latest-win64-lgpl/bin/ffmpeg.exe");
+                            e = a.GetEntry("ffmpeg-master-latest-win64-lgpl/bin/ffmpeg.exe");
                             if (e == null)
                             {
                                 //見つからなかった時
@@ -717,14 +714,13 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
                             }
                             else
                             {
-                                //見つかった時は「C:\test\dir\1.txt」として展開する
                                 //2番目の引数をTrueにすると、上書きする
                                 e.ExtractToFile(@".\ffmpeg.exe", true);
                             }
                         }
-                        else if(i == 1)
+                        else if (i == 1)
                         {
-                             e = a.GetEntry("ffmpeg-master-latest-win64-lgpl/bin/ffprobe.exe");
+                            e = a.GetEntry("ffmpeg-master-latest-win64-lgpl/bin/ffprobe.exe");
                             if (e == null)
                             {
                                 //見つからなかった時
@@ -732,14 +728,13 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
                             }
                             else
                             {
-                                //見つかった時は「C:\test\dir\1.txt」として展開する
                                 //2番目の引数をTrueにすると、上書きする
                                 e.ExtractToFile(@".\ffprobe.exe", true);
                             }
                         }
                         else
                         {
-                             e = a.GetEntry("ffmpeg-master-latest-win64-lgpl/bin/ffplay.exe");
+                            e = a.GetEntry("ffmpeg-master-latest-win64-lgpl/bin/ffplay.exe");
                             if (e == null)
                             {
                                 //見つからなかった時
@@ -747,16 +742,15 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
                             }
                             else
                             {
-                                //見つかった時は「C:\test\dir\1.txt」として展開する
                                 //2番目の引数をTrueにすると、上書きする
                                 e.ExtractToFile(@".\ffplay.exe", true);
                             }
 
                         }
-                        
+
                     }
 
-                    
+
                 }
                 mp4_mkv();
                 soundonoff();

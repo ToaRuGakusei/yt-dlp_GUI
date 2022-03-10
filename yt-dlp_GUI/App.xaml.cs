@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace youtube_dl_GUI
+namespace yt_dlp_GUI
 {
     /// <summary>
     /// App.xaml の相互作用ロジック
