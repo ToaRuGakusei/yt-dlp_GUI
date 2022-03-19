@@ -69,7 +69,7 @@ namespace youtube_dl_GUI
             string replacement = "";
             Regex regEx = new Regex(pattern);
             string sanitized = Regex.Replace(regEx.Replace(url, replacement), @"\s+", " ");
-            DateTime time1 = DateTime.Parse("2022/03/10 21:12:00");
+            DateTime time1 = DateTime.Parse("2022/03/19 10:30:00");
             DateTime time2 = DateTime.Parse(sanitized);
             if (time1.Date < time2.Date)
             {
@@ -160,7 +160,7 @@ namespace youtube_dl_GUI
             });
         }
         private ProcessStartInfo si;
-        private string cmd;
+        private string CommandLine;
         public int i = 0;
         public int n = 0;
         public string title;
@@ -197,6 +197,15 @@ namespace youtube_dl_GUI
                             string op = $"--ignore-errors --format bestaudio --extract-audio --audio-format {mp4_mkv} --audio-quality 160K --output \"{saveFolder}\\%(title)s.%(ext)s\" -i {_u}";
                             si = new ProcessStartInfo(@".\yt-dlp.exe", $"{op}");
                         }
+                        if (cmd.IsChecked == true)
+                        {
+                            StreamReader sm2 = new StreamReader(Path.GetTempPath() + "\\" + "cmd.txt");
+                            CommandLine = sm2.ReadToEnd();
+                            sm2.Close();
+                            si = new ProcessStartInfo(@".\yt-dlp.exe", $"{cmd} {_u} ");
+                        }
+
+                       
 
                         i++;
                     }
@@ -205,21 +214,7 @@ namespace youtube_dl_GUI
                 }
                 else
                 {
-                    if (File.Exists(Path.GetTempPath() + "\\" + "cmd.txt"))
-                    {
-                        StreamReader sm2 = new StreamReader(Path.GetTempPath() + "\\" + "cmd.txt");
-                        cmd = sm2.ReadToEnd();
-                        sm2.Close();
-                    }
-
-                    if (File.Exists(Path.GetTempPath() + "\\" + "toggle.txt"))
-                    {
-                        si = new ProcessStartInfo(@".\yt-dlp.exe", $"{cmd} {URl} ");
-                    }
-                    else
-                    {
-                        si = new ProcessStartInfo(@".\yt-dlp.exe", $" --format bestvideo[ext=mp4]+bestaudio[ext=m4a] --embed-subs --embed-thumbnail --all-subs --merge-output-format {mp4_mkv} --all-subs --embed-subs --embed-thumbnail --xattrs --add-metadata -ciw -o \"{saveFolder}\\%(title)s\" {URl} ");
-                    }
+                    
 
                 }
 
@@ -826,6 +821,21 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
         {
             wv.GoForward();//進む
 
+        }
+
+        private void cmd_Checked(object sender, RoutedEventArgs e)
+        {
+            save.IsEnabled = false;
+            Combo.IsEnabled = false;
+            yt_dlp_GUI.Command command = new yt_dlp_GUI.Command();
+            command.Owner = this;
+            command.Show();
+        }
+
+        private void cmd_Unchecked(object sender, RoutedEventArgs e)
+        {
+            save.IsEnabled = true;
+            Combo.IsEnabled = true;
         }
     }
 }
