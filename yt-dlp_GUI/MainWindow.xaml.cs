@@ -56,6 +56,27 @@ namespace youtube_dl_GUI
         }
         private void updateChecker()
         {
+            try
+            {
+                System.Diagnostics.FileVersionInfo vi =
+System.Diagnostics.FileVersionInfo.GetVersionInfo(
+ @".\yt-dlp.exe");
+
+                string ver = vi.ProductVersion;
+                if (ver == "2022.02.04 on Python 3.8.10" || ver == "2022.01.21 on Python 3.8.10" || ver == "2022.02.03 on Python 3.8.10" || ver == "2022.02.04 on Python 3.8.10")
+                {
+                    string[] Urls = new string[] { "https://github.com/yt-dlp/yt-dlp/releases/download/2022.03.08.1/yt-dlp.exe" };
+                    foreach (string _url in Urls)
+                    {
+                        downloadFileAsync(_url, $".\\yt-dlp.exe");
+                    }
+                }
+            }catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+           
+
             //自分のサイトから日時を引っ張ってくる
             WebClient wc = new WebClient();
             StreamReader sm = new StreamReader(wc.OpenRead("https://toaru-web.net/2022/01/06/yt-dlp_gui/"));
@@ -69,7 +90,7 @@ namespace youtube_dl_GUI
             string replacement = "";
             Regex regEx = new Regex(pattern);
             string sanitized = Regex.Replace(regEx.Replace(url, replacement), @"\s+", " ");
-            DateTime time1 = DateTime.Parse("2022/03/19 10:30:00");
+            DateTime time1 = DateTime.Parse("2022/03/24 10:43:00");
             DateTime time2 = DateTime.Parse(sanitized);
             if (time1.Date < time2.Date)
             {
@@ -85,13 +106,17 @@ namespace youtube_dl_GUI
 
             }
 
-
+             
 
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            
+            if(u.Text == "")
+            {
+                MessageBox.Show("URLを入力してください。","Error",MessageBoxButton.OK,MessageBoxImage.Error);
+                return;
+            }
             //ffmpegとyt-dlpをダウンロードする。
             if (!File.Exists(@".\yt-dlp.exe") && !File.Exists(@".\ffmpeg.exe") && !File.Exists(@".\ffplay.exe") && !File.Exists(@".\ffprobe.exe"))
             {
@@ -99,7 +124,7 @@ namespace youtube_dl_GUI
                 if (ms == MessageBoxResult.Yes)
                 {
                     int i = 0;
-                    string[] Urls = new string[] { "https://github.com/yt-dlp/yt-dlp/releases/download/2022.02.04/yt-dlp.exe", "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-lgpl.zip" };
+                    string[] Urls = new string[] { "https://github.com/yt-dlp/yt-dlp/releases/download/2022.03.08.1/yt-dlp.exe", "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-lgpl.zip" };
                     foreach (string url in Urls)
                     {
                         if (i == 0)
@@ -172,8 +197,11 @@ namespace youtube_dl_GUI
             string saveFolder = sm.ReadToEnd();
             StreamReader sm3 = new StreamReader(Path.GetTempPath() + "\\" + "switch.txt");
             string mp4_mkv = sm3.ReadToEnd();
+            StreamReader sm4 = new StreamReader(Path.GetTempPath() + "\\" + "cmd_check.txt");
+            string cmd_check = sm4.ReadToEnd();
             sm.Close();
             sm3.Close();
+            sm4.Close();
             this.Dispatcher.Invoke((Action)(() =>
             {
                 //
@@ -197,12 +225,12 @@ namespace youtube_dl_GUI
                             string op = $"--ignore-errors --format bestaudio --extract-audio --audio-format {mp4_mkv} --audio-quality 160K --output \"{saveFolder}\\%(title)s.%(ext)s\" -i {_u}";
                             si = new ProcessStartInfo(@".\yt-dlp.exe", $"{op}");
                         }
-                        if (cmd.IsChecked == true)
+                        if (cmd_check == "true")
                         {
                             StreamReader sm2 = new StreamReader(Path.GetTempPath() + "\\" + "cmd.txt");
                             CommandLine = sm2.ReadToEnd();
                             sm2.Close();
-                            si = new ProcessStartInfo(@".\yt-dlp.exe", $"{cmd} {_u} ");
+                            si = new ProcessStartInfo(@".\yt-dlp.exe", $"{CommandLine} {_u} ");
                         }
 
                        
@@ -836,6 +864,13 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
         {
             save.IsEnabled = true;
             Combo.IsEnabled = true;
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            yt_dlp_GUI.Command command = new yt_dlp_GUI.Command();
+            command.Owner = this;
+            command.Show();
         }
     }
 }

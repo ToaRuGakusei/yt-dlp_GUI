@@ -27,8 +27,21 @@ namespace yt_dlp_GUI
         }
          private void Load()
         {
-            StreamReader cmd = new StreamReader(System.IO.Path.GetTempPath() + "\\" + "cmd.txt");
-            string l = cmd.ReadToEnd();
+            StreamReader load = new StreamReader(System.IO.Path.GetTempPath() + "\\" + "cmd_check.txt");
+            string check = load.ReadToEnd();
+            load.Close();
+            if(check == "true")
+            {
+                cmd.IsChecked = true;
+            }
+
+            if(cmd.IsChecked == false)
+            {
+                textbox.IsEnabled = false;
+            }
+            
+            StreamReader cmdd = new StreamReader(System.IO.Path.GetTempPath() + "\\" + "cmd.txt");
+            string l = cmdd.ReadToEnd();
             textbox.Text = l;
         }
         private void OK_Click(object sender, RoutedEventArgs e)
@@ -38,6 +51,22 @@ namespace yt_dlp_GUI
             sm.Write(box);
             sm.Close();
             this.Close();
+        }
+
+        private void cmd_Unchecked(object sender, RoutedEventArgs e)
+        {
+            textbox.IsEnabled = false;
+            StreamWriter sm = new StreamWriter(System.IO.Path.GetTempPath() + "\\" + "cmd_check.txt", false);
+            sm.Write("false");
+            sm.Close();
+        }
+
+        private void cmd_Checked(object sender, RoutedEventArgs e)
+        {
+            textbox.IsEnabled = true;
+            StreamWriter sm = new StreamWriter(System.IO.Path.GetTempPath() + "\\" + "cmd_check.txt", false);
+            sm.Write("true");
+            sm.Close();
         }
     }
 }
