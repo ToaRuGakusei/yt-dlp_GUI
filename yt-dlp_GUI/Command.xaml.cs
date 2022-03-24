@@ -23,10 +23,15 @@ namespace yt_dlp_GUI
         public Command()
         {
             InitializeComponent();
+            if (!File.Exists(System.IO.Path.GetTempPath() + "\\" + "cmd_check.txt"))
+            {
+                File.Create(System.IO.Path.GetTempPath() + "\\" + "cmd_check.txt");
+            }
             Load();
         }
          private void Load()
         {
+            
             StreamReader load = new StreamReader(System.IO.Path.GetTempPath() + "\\" + "cmd_check.txt");
             string check = load.ReadToEnd();
             load.Close();
