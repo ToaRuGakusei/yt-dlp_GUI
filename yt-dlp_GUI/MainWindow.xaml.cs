@@ -90,7 +90,7 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
             string replacement = "";
             Regex regEx = new Regex(pattern);
             string sanitized = Regex.Replace(regEx.Replace(url, replacement), @"\s+", " ");
-            DateTime time1 = DateTime.Parse("2022/03/24 10:43:00");
+            DateTime time1 = DateTime.Parse("2022/04/02 9:53:00");
             DateTime time2 = DateTime.Parse(sanitized);
             if (time1.Date < time2.Date)
             {

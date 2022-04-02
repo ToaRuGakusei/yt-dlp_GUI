@@ -75,7 +75,7 @@
 
         <Button x:Name="Q" Grid.Column="7" Content="キューに追加" Margin="0,0,10,0" Grid.Row="8" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="106" Click="Q_Click" Grid.ColumnSpan="2"/>
         <Button x:Name="Clear" Grid.Column="7" Content="クリア" Margin="0,0,10,30" Grid.Row="8" HorizontalAlignment="Right" Width="106" Cursor="Hand" Click="Clear_Click" Height="27" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
-        <ListView x:Name="que" Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="3" Margin="10,0,10,0" Grid.RowSpan="3" SelectionChanged="que_SelectionChanged" Height="307" VerticalAlignment="Center">
+        <ListView x:Name="que" Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="3" Margin="10,10,10,0" Grid.RowSpan="3" SelectionChanged="que_SelectionChanged" Height="307" VerticalAlignment="Top">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="URL" DisplayMemberBinding="{Binding url}" Width="300"/>
