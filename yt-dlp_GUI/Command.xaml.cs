@@ -47,7 +47,9 @@ namespace yt_dlp_GUI
             
             StreamReader cmdd = new StreamReader(System.IO.Path.GetTempPath() + "\\" + "cmd.txt");
             string l = cmdd.ReadToEnd();
-            textbox.Text = l;
+            string box = l.ToString().Replace("System.Windows.Controls.TextBox", "");
+            cmdd.Close();
+            textbox.Text = box;
         }
         private void OK_Click(object sender, RoutedEventArgs e)
         {
