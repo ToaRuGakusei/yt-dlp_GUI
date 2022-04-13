@@ -187,6 +187,7 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
         private ProcessStartInfo si;
         private string CommandLine;
         public int i = 0;
+        public string cmd_check;
         public int n = 0;
         public string title;
         public string ex;
@@ -197,11 +198,20 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
             string saveFolder = sm.ReadToEnd();
             StreamReader sm3 = new StreamReader(Path.GetTempPath() + "\\" + "switch.txt");
             string mp4_mkv = sm3.ReadToEnd();
-            StreamReader sm4 = new StreamReader(Path.GetTempPath() + "\\" + "cmd_check.txt");
-            string cmd_check = sm4.ReadToEnd();
+            if(!File.Exists(Path.GetTempPath() + "\\" + "cmd_check.txt"))
+            {
+
+            }
+            else
+            {
+                StreamReader sm4 = new StreamReader(Path.GetTempPath() + "\\" + "cmd_check.txt");
+                cmd_check = sm4.ReadToEnd();
+                sm4.Close();
+            }
+
             sm.Close();
             sm3.Close();
-            sm4.Close();
+         
             this.Dispatcher.Invoke((Action)(() =>
             {
                 //
@@ -548,6 +558,8 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
         }
         private void load()
         {
+            //xmlに書き換え予定
+            
             if (!File.Exists(Path.GetTempPath() + "\\" + "sound.txt"))
             {
                 FileStream fs = File.Create(Path.GetTempPath() + "\\" + "sound.txt");
@@ -635,7 +647,7 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
         private void mp4_mkv()
         {
 
-
+            //xmlに書き換え予定
             StreamWriter sm2 = new StreamWriter(Path.GetTempPath() + "\\" + "switch.txt", false);
 
             if (mp4.IsSelected == true)
@@ -868,9 +880,9 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            yt_dlp_GUI.Command command = new yt_dlp_GUI.Command();
-            command.Owner = this;
-            command.Show();
+            yt_dlp_GUI.Command setting = new yt_dlp_GUI.Command();
+            setting.Owner = this;
+            setting.Show();
         }
     }
 }
