@@ -63,9 +63,9 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
  @".\yt-dlp.exe");
 
                 string ver = vi.ProductVersion;
-                if (ver == "2022.02.04 on Python 3.8.10" || ver == "2022.01.21 on Python 3.8.10" || ver == "2022.02.03 on Python 3.8.10" || ver == "2022.02.04 on Python 3.8.10")
+                if (ver == "2022.02.04 on Python 3.8.10" || ver == "2022.01.21 on Python 3.8.10" || ver == "2022.02.03 on Python 3.8.10" || ver == "2022.02.04 on Python 3.8.10" || ver == "2022.03.08.1 on Python 3.8.10" || ver == "2022.03.08 on Python 3.8.10")
                 {
-                    string[] Urls = new string[] { "https://github.com/yt-dlp/yt-dlp/releases/download/2022.03.08.1/yt-dlp.exe" };
+                    string[] Urls = new string[] { "https://github.com/yt-dlp/yt-dlp/releases/download/2022.04.08/yt-dlp.exe" };
                     foreach (string _url in Urls)
                     {
                         downloadFileAsync(_url, $".\\yt-dlp.exe");
@@ -90,7 +90,7 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
             string replacement = "";
             Regex regEx = new Regex(pattern);
             string sanitized = Regex.Replace(regEx.Replace(url, replacement), @"\s+", " ");
-            DateTime time1 = DateTime.Parse("2022/04/02 9:53:00");
+            DateTime time1 = DateTime.Parse("2022/04/13 22:53:00");
             DateTime time2 = DateTime.Parse(sanitized);
             if (time1.Date < time2.Date)
             {
