@@ -7,7 +7,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -71,11 +70,12 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
                         downloadFileAsync(_url, $".\\yt-dlp.exe");
                     }
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
             }
-           
+
 
             //自分のサイトから日時を引っ張ってくる
             WebClient wc = new WebClient();
@@ -90,7 +90,7 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
             string replacement = "";
             Regex regEx = new Regex(pattern);
             string sanitized = Regex.Replace(regEx.Replace(url, replacement), @"\s+", " ");
-            DateTime time1 = DateTime.Parse("2022/04/13 22:53:00");
+            DateTime time1 = DateTime.Parse("2022/04/19 12:17:00");
             DateTime time2 = DateTime.Parse(sanitized);
             if (time1.Date < time2.Date)
             {
@@ -106,15 +106,15 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
 
             }
 
-             
+
 
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            if(u.Text == "")
+            if (u.Text == "")
             {
-                MessageBox.Show("URLを入力してください。","Error",MessageBoxButton.OK,MessageBoxImage.Error);
+                MessageBox.Show("URLを入力してください。", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             //ffmpegとyt-dlpをダウンロードする。
@@ -198,20 +198,14 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
             string saveFolder = sm.ReadToEnd();
             StreamReader sm3 = new StreamReader(Path.GetTempPath() + "\\" + "switch.txt");
             string mp4_mkv = sm3.ReadToEnd();
-            if(!File.Exists(Path.GetTempPath() + "\\" + "cmd_check.txt"))
-            {
+            StreamReader sm4 = new StreamReader(Path.GetTempPath() + "\\" + "cmd_check.txt");
+            cmd_check = sm4.ReadToEnd();
+            sm4.Close();
 
-            }
-            else
-            {
-                StreamReader sm4 = new StreamReader(Path.GetTempPath() + "\\" + "cmd_check.txt");
-                cmd_check = sm4.ReadToEnd();
-                sm4.Close();
-            }
 
             sm.Close();
             sm3.Close();
-         
+
             this.Dispatcher.Invoke((Action)(() =>
             {
                 //
@@ -243,7 +237,7 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
                             si = new ProcessStartInfo(@".\yt-dlp.exe", $"{CommandLine} {_u} ");
                         }
 
-                       
+
 
                         i++;
                     }
@@ -252,7 +246,7 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
                 }
                 else
                 {
-                    
+
 
                 }
 
@@ -286,13 +280,13 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
                         if (que.Items.Count == 0)
                         {
                             soundplayer();
-                            if(c == true)
+                            if (c == true)
                             {
                                 MessageBox.Show("キャンセルされました。", "キャンセル", MessageBoxButton.OK, MessageBoxImage.Information);
 
                             }
                             else
-                            MessageBox.Show("ダウンロードが終了しました。", "終了", MessageBoxButton.OK, MessageBoxImage.Information);
+                                MessageBox.Show("ダウンロードが終了しました。", "終了", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
 
                     }));
@@ -559,7 +553,7 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
         private void load()
         {
             //xmlに書き換え予定
-            
+
             if (!File.Exists(Path.GetTempPath() + "\\" + "sound.txt"))
             {
                 FileStream fs = File.Create(Path.GetTempPath() + "\\" + "sound.txt");
@@ -591,6 +585,11 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
             if (!File.Exists(Path.GetTempPath() + "\\" + "switch.txt"))
             {
                 FileStream fs = File.Create(Path.GetTempPath() + "\\" + "switch.txt");
+                fs.Close();
+            }
+            if (!File.Exists(Path.GetTempPath() + "\\" + "cmd_check.txt"))
+            {
+                FileStream fs = File.Create(Path.GetTempPath() + "\\" + "cmd_check.txt");
                 fs.Close();
             }
             StreamReader sr2 = new StreamReader(Path.GetTempPath() + "\\" + "switch.txt");
@@ -728,7 +727,7 @@ System.Diagnostics.Process.GetProcessesByName("yt-dlp");
                     fileStream.Flush();
                     n++;
                 }
-            }                                                      
+            }
 
 
             if (n == 2)
