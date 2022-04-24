@@ -90,7 +90,7 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
             string replacement = "";
             Regex regEx = new Regex(pattern);
             string sanitized = Regex.Replace(regEx.Replace(url, replacement), @"\s+", " ");
-            DateTime time1 = DateTime.Parse("2022/04/19 12:17:00");
+            DateTime time1 = DateTime.Parse("2022/04/24 19:04:00");
             DateTime time2 = DateTime.Parse(sanitized);
             if (time1.Date < time2.Date)
             {
@@ -283,10 +283,14 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
                             if (c == true)
                             {
                                 MessageBox.Show("キャンセルされました。", "キャンセル", MessageBoxButton.OK, MessageBoxImage.Information);
-
+                                c = false;
+                                cancel.IsEnabled = false;
                             }
                             else
+                            {
                                 MessageBox.Show("ダウンロードが終了しました。", "終了", MessageBoxButton.OK, MessageBoxImage.Information);
+                                cancel.IsEnabled = false;
+                            }
                         }
 
                     }));
@@ -484,7 +488,7 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
             }
             ;
         }
-        private bool c;
+        private bool c = false;
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process[] ps =
