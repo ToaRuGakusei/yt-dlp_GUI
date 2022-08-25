@@ -62,9 +62,9 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
  @".\yt-dlp.exe");
 
                 string ver = vi.ProductVersion;
-                if (ver == "2022.02.04 on Python 3.8.10" || ver == "2022.01.21 on Python 3.8.10" || ver == "2022.02.03 on Python 3.8.10" || ver == "2022.02.04 on Python 3.8.10" || ver == "2022.03.08.1 on Python 3.8.10" || ver == "2022.03.08 on Python 3.8.10")
+                if (ver == "2022.02.04 on Python 3.8.10" || ver == "2022.01.21 on Python 3.8.10" || ver == "2022.02.03 on Python 3.8.10" || ver == "2022.02.04 on Python 3.8.10" || ver == "2022.03.08.1 on Python 3.8.10" || ver == "2022.03.08 on Python 3.8.10" || ver == "2022.03.08.1 on Python 3.8.10")
                 {
-                    string[] Urls = new string[] { "https://github.com/yt-dlp/yt-dlp/releases/download/2022.04.08/yt-dlp.exe" };
+                    string[] Urls = new string[] { "https://github.com/yt-dlp/yt-dlp/releases/download/2022.08.19/yt-dlp.exe" };
                     foreach (string _url in Urls)
                     {
                         downloadFileAsync(_url, $".\\yt-dlp.exe");
@@ -124,7 +124,7 @@ System.Diagnostics.FileVersionInfo.GetVersionInfo(
                 if (ms == MessageBoxResult.Yes)
                 {
                     int i = 0;
-                    string[] Urls = new string[] { "https://github.com/yt-dlp/yt-dlp/releases/download/2022.03.08.1/yt-dlp.exe", "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-lgpl.zip" };
+                    string[] Urls = new string[] { "https://github.com/yt-dlp/yt-dlp/releases/download/2022.08.19/yt-dlp.exe", "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-lgpl.zip" };
                     foreach (string url in Urls)
                     {
                         if (i == 0)
